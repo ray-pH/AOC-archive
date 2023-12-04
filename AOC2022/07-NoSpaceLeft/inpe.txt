@@ -1,0 +1,8 @@
+$ cd /
+$ ls
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd d
+$ ls
+100 ae
