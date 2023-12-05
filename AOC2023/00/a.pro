@@ -18,6 +18,19 @@ map(Pred, [A|As], [B|Bs]) :-
     call(Pred, A, B),
     map(Pred, As, Bs).
 
+split_by(Elem, List, [List]) :-
+    \+ member(Elem, List).
+split_by(Elem, List, [LArr|RestArr]) :-
+    append(LArr, [Elem|Rest], List),
+    split_by(Elem, Rest, RestArr).
+
+flatten1([], []).
+flatten1([[]|Cs], Flattened) :-
+    flatten1(Cs, Flattened).
+flatten1([C|Cs], Flattened) :-
+    flatten1(Cs, FlattenedRest),
+    append(C, FlattenedRest, Flattened).
+
 main :-
     read_file_lines('./inpex.txt', Lines),
     write(Lines), nl.
