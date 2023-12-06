@@ -9,6 +9,9 @@ I used AOC as a great opportunity to learn a new language, a new programming par
 ## 2023
 This year, i use prolog.
 
+It's a fun language so far, the paradigm not that far from the functional paradigm. The only cons i feel is the inability to write "inline predicate". It does make sense i guess, it suppose to be relation predicate, not a function.
+*But maybe there's a way to achieve similar thing syntactically and i just don't know it yet*
+
 ## 2022
 Before the start of AOC, i thought i'm going to use AOC 2022 to learn assembly. But after trying to write my first assembly code, i pretty much gave up on the idea. Assembly is far too simple of a "language". Sure maybe i can solve day 1 with it, but the entire AOC? No thanks. So instead, i continue using haskell.
 
