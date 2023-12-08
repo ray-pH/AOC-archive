@@ -81,7 +81,7 @@ def test_bp(id, bp):
     res = [0, 0, 0, 0]
     rob = [0, 0, 0, 1]
     branches = [(rob, res)]
-    branches = iter(id,bp, branches, 24)
+    branches = iter(id,bp, branches, 32)
     res = [b[1] for b in branches]
     geos = [r[0] for r in res]
     maxgeo = max(geos)
@@ -92,9 +92,12 @@ def test_bp(id, bp):
 # with open('inpex.txt', 'r') as f:
 with open('input.txt', 'r') as f:
 # with open('inptest.txt', 'r') as f:
-    lines = f.read().splitlines()
+    lines = f.read().splitlines()[:3]
 
 maxgeos = [test_bp(i+1, parse_blueprint(line)) for i, line in enumerate(lines)]
-quality = [g * (i+1) for i,g in enumerate(maxgeos)]
+
+p = 1
+for m in maxgeos: p *= m
+
 print(maxgeos)
-print(sum(quality))
+print(p)
