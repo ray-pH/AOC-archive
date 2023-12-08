@@ -57,3 +57,19 @@ join_strings([S], S).
 join_strings([S1, S2|Ss], Joined) :-
     string_concat(S1, S2, S1S2),
     join_strings([S1S2|Ss], Joined).
+
+gcd(X, 0, X) :- !.
+gcd(X, Y, Z) :-
+    H is X rem Y,
+    gcd(Y, H, Z).
+lcm(X,Y,LCM):-
+    gcd(X,Y,GCD),
+    LCM is X*Y//GCD.
+
+gcd_of_list([], 0) :- !.
+gcd_of_list([X|Xs], GCD) :- gcd_of_list(Xs, GCD2), gcd(X, GCD2, GCD). 
+lcm_of_list([],1) :- !.
+lcm_of_list([X|Xs],LCM) :- lcm_of_list(Xs,LCM2), lcm(X,LCM2,LCM).
+
+write_list([]).
+write_list([X|Xs]) :- write(X), nl, write_list(Xs).
