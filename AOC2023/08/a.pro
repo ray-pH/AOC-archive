@@ -8,20 +8,19 @@ parse_network(Line, [Name,Left,Right]) :-
     string_chars(RightStr, RightChars),
     split_string(RightStr, ",", " ", [Left, Right]).
 
-% move(Dir, Network, Current, Next)
-% move(Dir, [[Name,_,_]|Ns], Current, Next) :-
-%     Name \= Current, move(Dir, Ns, Current, Next).
-move('L', [[Current,Left,_]|_], Current, Left).
-move('R', [[Current,_,Right]|_], Current, Right).
-move(Dir, [_|Ns], Current, Next) :- move(Dir, Ns, Current, Next).
+move(Dir, NetworkAssoc, Current, Next) :- 
+    get_assoc(Current, NetworkAssoc, [Left, Right]),
+    (Dir = 'L' -> Next = Left; Next = Right).
 
 % move_steps_untilZZZ(Steps, Newtork, [Pos, Count], [LastPos, LastCount])
 move_steps_untilZZZ(_, _, ["ZZZ", Count], ["ZZZ", Count]).
-move_steps_untilZZZ([S|Ss], Network, [Pos, Count], [LastPos, LastCount]) :-
+move_steps_untilZZZ([S|Ss], NetworkAssoc, [Pos, Count], [LastPos, LastCount]) :-
     cycle_list([S|Ss], CSteps),
-    move(S, Network, Pos, NPos),
+    move(S, NetworkAssoc, Pos, NPos),
     NCount is Count + 1,
-    move_steps_untilZZZ(CSteps, Network, [NPos, NCount], [LastPos, LastCount]).
+    move_steps_untilZZZ(CSteps, NetworkAssoc, [NPos, NCount], [LastPos, LastCount]).
+
+networklist_pair([Name,Left,Right], Name-[Left,Right]).
 
 main :-
     % read_file_lines('./inpex.txt', Lines),
@@ -30,7 +29,9 @@ main :-
     Lines = [StepsStr, _ |NetworkStr],
     string_chars(StepsStr, Steps),
     map(parse_network, NetworkStr, Network),
-    move_steps_untilZZZ(Steps, Network, ["AAA", 0], [LastPos, Count]),
+    map(networklist_pair, Network, NetworkPairs),
+    list_to_assoc(NetworkPairs, NetworkAssoc),
+    move_steps_untilZZZ(Steps, NetworkAssoc, ["AAA", 0], [LastPos, Count]),
     % write(Steps), nl,
     % write(NetworkStr), nl,
     % write(Network), nl,
