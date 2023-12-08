@@ -26,6 +26,14 @@ zip(_, [], []).
 zip([A|As], [B|Bs], [[A,B]|Cs]) :-
     zip(As, Bs, Cs).
 
+tail([_|Tail], Tail).
+
+head([_],[]).
+head([H|Hs], [H|RestHead]) :- head(Hs, RestHead).
+
+% cycle_list(Original, Cycled)
+cycle_list([H|Hs], Cycled) :- append(Hs, [H], Cycled).
+
 prod_list([], 1).
 prod_list([A|As], Prod) :-
     prod_list(As, ProdRest),
