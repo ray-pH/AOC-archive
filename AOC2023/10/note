@@ -1,0 +1,15 @@
+Something fun
+
+char_at(Row-Col,Map,Char) :-
+    nth0(Row,Map,RowChars),
+    nth0(Col,RowChars,Char).
+
+find_start(Map, Row-Col) :-
+    char_at(Row-Col,Map,'S').
+
+main :-
+    read_file_lines('./inpex.txt', Lines),
+    maplist(string_chars, Lines, Map),
+    find_start(Map, Start),
+    write(Start),
+    nl.
