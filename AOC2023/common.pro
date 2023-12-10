@@ -73,3 +73,12 @@ lcm_of_list([X|Xs],LCM) :- lcm_of_list(Xs,LCM2), lcm(X,LCM2,LCM).
 
 write_list([]).
 write_list([X|Xs]) :- write(X), nl, write_list(Xs).
+
+list_change_element(List, Index, NewElement, NewList) :-
+    nth0(Index, List, _, Rest),
+    nth0(Index, NewList, NewElement, Rest).
+list2D_change_element(List2D, [Row, Col], NewElement, NewList2D) :-
+    nth0(Row, List2D, RowList, Rest),
+    nth0(Col, RowList, _, RestRow),
+    nth0(Row, NewList2D, NewRowList, Rest),
+    nth0(Col, NewRowList, NewElement, RestRow).
