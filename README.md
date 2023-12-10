@@ -48,6 +48,48 @@ And yeah, looking at it, the pattern does holds. Knowing this, the problem becam
 The result turned out to be `24035773251517`. So even if i can free the memory, bruteforce was never going to solve this problem anyway.
 <!-- </details> -->
 
+### Day 10
+This day, I figured out one more nice thing about prolog. There's definitely something to like about declarative style of programming. Here are some nice thing that i found:
+
+To get a coordinate that satisfy something, just describe that. In 2023/10 i use it to find `(Row,Col)` where the character in that position is `'S'`
+```prolog
+char_at((Row,Col), Map, Char) :-
+    nth0(Row, Map, RowChars),
+    nth0(Col, RowChars, Char).
+
+find_start(Map, StartPos) :-
+    char_at(StartPos, Map, 'S').
+```
+
+Also, when i'm trying to search for valid direction to go from the start, i just describe the thing. I just tell it that the `StartDirection` is associated with some vector, and in that position we have a pipe that satisfy `pipe_direction()`. By the fact that the vector in `direction_vector(Dir,Vec)` has only four possible value, prolog will only search for those four values.
+```prolog
+direction_vector('v', (1,0)).
+direction_vector('^', (-1,0)).
+direction_vector('>', (0,1)).
+direction_vector('<', (0,-1)).
+
+pipe_direction('v', '|', 'v').
+pipe_direction('^', '|', '^').
+pipe_direction('>', '-', '>').
+pipe_direction('<', '-', '<').
+pipe_direction('v', 'L', '>').
+pipe_direction('<', 'L', '^').
+pipe_direction('v', 'J', '<').
+pipe_direction('>', 'J', '^').
+pipe_direction('^', '7', '<').
+pipe_direction('>', '7', 'v').
+pipe_direction('^', 'F', '>').
+pipe_direction('<', 'F', 'v').
+
+add_vector((X1,Y1), (X2,Y2), (X3,Y3)) :- X3 is X1 + X2, Y3 is Y1 + Y2.
+
+valid_start_neighbour(Map, StartPos, NeighbourPos, StartDirection) :-
+    direction_vector(StartDirection, DV), 
+    add_vector(StartPos, DV, NeighbourPos),
+    char_at(NeighbourPos, Map, Char),
+    pipe_direction(StartDirection, Char, _).
+```
+
 
 ## 2022
 Before the start of AOC, i thought i'm going to use AOC 2022 to learn assembly. But after trying to write my first assembly code, i pretty much gave up on the idea. Assembly is far too simple of a "language". Sure maybe i can solve day 1 with it, but the entire AOC? No thanks. So instead, i continue using haskell.
