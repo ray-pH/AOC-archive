@@ -30,16 +30,7 @@ pipe_direction('^', 'F', '>').
 pipe_direction('<', 'F', 'v').
 
 is_pipe_char(Char) :- member(Char, ['|', '-', 'L', 'J', '7', 'F']).
-is_pipeconnectbefore_char(Char) :- member(Char, ['-', '7', 'J']).
-is_hopeningpipe_char(Char) :- member(Char, ['F', 'L']).
-is_hclosingpipe_char(Char) :- member(Char, ['J', '7']).
-
-% F-7 : no change
-% F-J : flip
-% L-7 : flip
-% L-J : no change
-pipepair_flipstate('F','J').
-pipepair_flipstate('L','7').
+is_pipe_flipping_char(Char) :- member(Char, ['|', 'L', 'J']).
 
 char_at((Row,Col), Map, Char) :-
     nth0(Row, Map, RowChars),
@@ -80,36 +71,15 @@ flip_state(1, 0).
 
 is_row_pipe(Col, PolygonRowCoords) :- member(Col, PolygonRowCoords).
 
-
-get_hclosing_pipe(Col, MapRow, Col) :-
-    nth0(Col, MapRow, C), is_hclosingpipe_char(C).
-get_hclosing_pipe(Col, MapRow, ClosingCol) :-
-    nth0(Col, MapRow, C),
-    \+ is_hclosingpipe_char(C),
-    NCol is Col + 1,
-    get_hclosing_pipe(NCol, MapRow, ClosingCol).
-
-
-need_to_flip(Col, MapRow) :- nth0(Col, MapRow, '|').
-need_to_flip(Col, MapRow) :- 
-    nth0(Col, MapRow, C),
-    is_hopeningpipe_char(C),
-    get_hclosing_pipe(Col, MapRow, ClosingCol),
-    nth0(ClosingCol, MapRow, ClosingC),
-    pipepair_flipstate(C, ClosingC).
-
 % polygon_row_insides(PoygonRowCoords, Map, Insides) :-
 polygon_row_insides(Col, _, _, MapRow, []) :-
     length(MapRow, MapRowLength), Col >= MapRowLength.
 %pipe:
 polygon_row_insides(Col, State, PoygonRowCoords, MapRow, Insides) :-
     is_row_pipe(Col, PoygonRowCoords),
-    (need_to_flip(Col, MapRow) -> 
-        flip_state(State, NState)
-    ;
-        NState = State),
+    nth0(Col, MapRow, C),
+    (is_pipe_flipping_char(C) -> flip_state(State, NState); NState = State),
     NCol is Col + 1,
-    % nth0(Col, MapRow, C),
     % write('Pipe '), write(Col), write(': '), write(State), write(' '), write(C), write(' '), write(NState), nl,
     polygon_row_insides(NCol, NState, PoygonRowCoords, MapRow, Insides).
 % not a pipe:
