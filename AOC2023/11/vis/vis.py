@@ -53,8 +53,8 @@ def animate(i):
 
 anim = animation.FuncAnimation(fig, animate, frames=frame, interval=24)
 plt.grid(alpha=0.2)
-# plt.show()
-anim.save('vis.gif', fps=24)
+plt.show()
+# anim.save('vis.gif', fps=24)
 
 
 
