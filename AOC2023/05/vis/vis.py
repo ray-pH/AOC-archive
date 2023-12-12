@@ -1,6 +1,7 @@
 from collections import namedtuple
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+plt.style.use('dark_background')
 
 Section = namedtuple('Section',[ 
     'input', 'split', 'mapped', 'sorted', 'combined'
@@ -33,6 +34,10 @@ names = ["seed",
     "location",
  ]
 
+bgcolor = "#0f0f23"
+fig, ax = plt.subplots(facecolor=bgcolor) #type: ignore
+ax : plt.Axes = ax
+ax.set_facecolor(bgcolor)
 
 miny = 9999999999999999999999999
 maxy = 0
@@ -46,7 +51,7 @@ for i,g in enumerate(groups):
         maxy = max(maxy,u0,u1)
         x = [xleft, xleft, xright, xright]
         y = [u0+1, l0, l1, u1+1]
-        plt.gca().add_patch(patches.Polygon(
+        ax.add_patch(patches.Polygon(
             xy=list(zip(x,y)),
             fill=True,
             alpha=0.5,
@@ -55,14 +60,14 @@ for i,g in enumerate(groups):
     n0,n1 = singlenums[i]
     x = [xleft, xleft, xright, xright]
     y = [n0+1, n0, n1, n1+1]
-    plt.gca().add_patch(patches.Polygon(
+    ax.add_patch(patches.Polygon(
         xy=list(zip(x,y)),
         fill=True,
-        color='#d62728',
+        color='#229922',
     ))
 
-plt.ylim(miny, maxy)
-plt.xlim(0, sectiongap + len(groups)*(sectiongap + dx_section))
-plt.gca().set_xticklabels(names)
-plt.savefig('vis05.png')
+ax.set_ylim(miny, maxy)
+ax.set_xlim(0, sectiongap + len(groups)*(sectiongap + dx_section))
+ax.set_xticklabels(names) #type: ignore
+plt.savefig('vis05.png', facecolor=bgcolor, dpi=200)
 # plt.show()
