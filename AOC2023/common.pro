@@ -16,6 +16,16 @@ map(Pred, [A|As], [B|Bs]) :-
     call(Pred, A, B),
     map(Pred, As, Bs).
 
+maplist_debug(_, [], []).
+maplist_debug(Pred, [A|As], [B|Bs]) :-
+    call(Pred, A, B),
+    % debug
+    length(As, Len), write("---------------------"), 
+    write("Remaining: "), writeln(Len),
+    write(A), nl, write(" -> "), writeln(B),
+    % debug
+    maplist_debug(Pred, As, Bs).
+
 map3(_, [], _, []).
 map3(Pred, [A|As], B, [C|Cs]) :-
     call(Pred, A, B, C),
@@ -30,6 +40,18 @@ tail([_|Tail], Tail).
 
 head([_],[]).
 head([H|Hs], [H|RestHead]) :- head(Hs, RestHead).
+
+take(0, _, []) :- !.
+take(N, [H|T1], [H|T2]) :-
+    N > 0,
+    N1 is N - 1,
+    take(N1, T1, T2).
+
+drop(0, List, List) :- !.
+drop(N, [_|T1], T2) :-
+    N > 0,
+    N1 is N - 1,
+    drop(N1, T1, T2).
 
 % cycle_list(Original, Cycled)
 cycle_list([H|Hs], Cycled) :- append(Hs, [H], Cycled).
