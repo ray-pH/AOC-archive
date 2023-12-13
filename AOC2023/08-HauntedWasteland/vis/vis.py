@@ -1,24 +1,37 @@
 import pydot
 import os
 
+bgcolor  = "#0f0f23"
+grcolor1 = "#009900"
+grcolor2 = "#55aa55"
+ylcolor1 = "#e7e75f"
+ylcolor2 = "#e7e75f"
+whcolor  = "#ffffff"
+
 def generate_graph(network):
-    graph = pydot.Dot("my_graph", graph_type="digraph")
+    graph = pydot.Dot("my_graph", graph_type="digraph", bgcolor=bgcolor)
 
     def add_node(name):
         if name[-1] == 'Z':
-            graph.add_node(pydot.Node(name, label=name, style="filled", color="#ff9896"))
+            graph.add_node(pydot.Node(name, label=name, style="filled", 
+                                      color=ylcolor2, fontcolor=bgcolor))
+                                      # color="#ff9896", fontcolor=whcolor))
         elif name[-1] == 'A':
-            graph.add_node(pydot.Node(name, label=name, style="filled", color="#aec7e8"))
+            graph.add_node(pydot.Node(name, label=name, style="filled", 
+                                      color=grcolor2, fontcolor=whcolor))
+                                      # color="#aec7e8"))
         else:
-            graph.add_node(pydot.Node(name, label=name))
+            graph.add_node(pydot.Node(name, label=name, fontcolor=whcolor, color=whcolor))
 
     for name, left, right in network:
         add_node(name)
         add_node(left)
         add_node(right)
     for name, left, right in network:
-        graph.add_edge(pydot.Edge(name, left, color="#1f77b4"))
-        graph.add_edge(pydot.Edge(name, right, color="#d62728"))
+        # graph.add_edge(pydot.Edge(name, left, color="#1f77b4"))
+        # graph.add_edge(pydot.Edge(name, right, color="#d62728"))
+        graph.add_edge(pydot.Edge(name, left, color=grcolor1))
+        graph.add_edge(pydot.Edge(name, right, color=ylcolor1))
     return(graph)
 
 net = tuple[str, str, str]
@@ -80,7 +93,6 @@ def generate_separate():
 
 def generate_single():
     print("generating single graph")
-    # with open('../inpex3.txt', 'r') as f:
     with open('../input.txt', 'r') as f:
         lines = f.read().splitlines()
     networkstr = lines[2:]
@@ -95,5 +107,22 @@ def generate_single():
     os.system("dot -Kneato -Tsvg input.dot > graph.svg")
     print("done graphing svg")
 
+def generate_example():
+    print("generating single graph")
+    with open('../inpex3.txt', 'r') as f:
+        lines = f.read().splitlines()
+    networkstr = lines[2:]
+    network = list(map(parse_network, networkstr))
+    print("done parsing network")
+    graph = generate_graph(network)
+
+    graph.write_raw("inpex.dot") #type: ignore
+    # run $ dot -Kneato -Tpng output.dot > out.png
+    os.system("dot -Kneato -Tpng inpex.dot > graphex.png")
+    print("done graphing png")
+    os.system("dot -Kneato -Tsvg inpex.dot > graphex.svg")
+    print("done graphing svg")
+
 generate_single()
 generate_separate()
+# generate_example()
