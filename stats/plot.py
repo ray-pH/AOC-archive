@@ -16,14 +16,39 @@ def plot(year : int):
 
 def plot_relative(year : int):
     day, _, _, total = getdata(year)
-    total = [t / total[-1] for t in total]
+    total = [t / total[-1] * 100 for t in total]
     plt.plot(day, total, label=f"{year}")
 
-# for year in range(2015, 2023+1):
-for year in range(2023, 2015-1, -1):
-    plot(year)
-    # plot_relative(year)
-plt.legend()
-plt.grid()
-plt.show()
+def plot_silverperc(year : int):
+    day, _, silver, total = getdata(year)
+    silverperc = [s/t * 100 for s,t in zip(silver,total)]
+    plt.plot(day, silverperc, label=f"{year}")
 
+def plot_bar(year : int):
+    day, _, _, total = getdata(year)
+    plt.bar(day, total, label=f"{year}")
+    plt.xticks(day, day)
+def plot_silverperc_bar(year : int):
+    day, _, silver, total = getdata(year)
+    silverperc = [s/t * 100 for s,t in zip(silver,total)]
+    plt.bar(day, silverperc, label=f"{year}")
+    plt.xticks(day, day)
+
+def call_plotfunction(f, years : list, ylabel : str):
+    plt.clf()
+    for year in years: f(year)
+    plt.xlabel("Day")
+    plt.ylabel(ylabel)
+    plt.legend()
+    # plt.grid()
+    plt.show()
+
+years = list(range(2023, 2015-1, -1))
+# inverted so that the recent years are plotted first and have nicer colors
+
+call_plotfunction(plot, years, "Solver count")
+call_plotfunction(plot_relative, years, "Solver count relative to day 1 (%)")
+call_plotfunction(plot_silverperc, years, "percentage of user who only solved part 1 (%)")
+
+# call_plotfunction(plot_bar, [2023], "Solver count")
+# call_plotfunction(plot_silverperc_bar, [2023], "percentage of user who only solved part 1 (%)")
