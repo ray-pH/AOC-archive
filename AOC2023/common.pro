@@ -104,3 +104,12 @@ list2D_change_element(List2D, [Row, Col], NewElement, NewList2D) :-
     nth0(Col, RowList, _, RestRow),
     nth0(Row, NewList2D, NewRowList, Rest),
     nth0(Col, NewRowList, NewElement, RestRow).
+
+transpose([], []).
+transpose([[]|_], []).
+transpose(Matrix, [Col|Transposed]) :-
+    transpose_1st_col(Matrix, Col, RestMatrix),
+    transpose(RestMatrix, Transposed),!.
+transpose_1st_col([], [], []).
+transpose_1st_col([[H|T]|Rows], [H|Hs], [T|Ts]) :-
+    transpose_1st_col(Rows, Hs, Ts).
