@@ -48,7 +48,7 @@ years = list(range(2023, 2015-1, -1))
 
 call_plotfunction(plot, years, "Solver count")
 call_plotfunction(plot_relative, years, "Solver count relative to day 1 (%)")
-call_plotfunction(plot_silverperc, years, "percentage of user who only solved part 1 (%)")
+call_plotfunction(plot_silverperc, years, "percentage of users who only solved part 1 (%)")
 
-# call_plotfunction(plot_bar, [2023], "Solver count")
-# call_plotfunction(plot_silverperc_bar, [2023], "percentage of user who only solved part 1 (%)")
+call_plotfunction(plot_bar, [2023], "Solver count")
+call_plotfunction(plot_silverperc_bar, [2023], "percentage of users who only solved part 1 (%)")
