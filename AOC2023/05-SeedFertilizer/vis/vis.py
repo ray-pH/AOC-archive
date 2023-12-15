@@ -53,8 +53,10 @@ for i,g in enumerate(groups):
         y = [u0+1, l0, l1, u1+1]
         ax.add_patch(patches.Polygon(
             xy=list(zip(x,y)),
-            fill=True,
+            # fill=True,
             alpha=0.5,
+            facecolor='#009900',
+            edgecolor=None,
         ))
 
     n0,n1 = singlenums[i]
@@ -63,11 +65,13 @@ for i,g in enumerate(groups):
     ax.add_patch(patches.Polygon(
         xy=list(zip(x,y)),
         fill=True,
-        color='#229922',
+        color='#ffff66',
+        # color='#229922',
     ))
 
 ax.set_ylim(miny, maxy)
 ax.set_xlim(0, sectiongap + len(groups)*(sectiongap + dx_section))
 ax.set_xticklabels(names) #type: ignore
 plt.savefig('vis05.png', facecolor=bgcolor, dpi=200)
+# plt.savefig('vis05e.png', facecolor=bgcolor, dpi=200)
 # plt.show()
