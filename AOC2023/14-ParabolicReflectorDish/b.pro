@@ -21,13 +21,11 @@ groups_slideRight(Groups, SlidGroups) :-
     maplist(group_slideRight, Groups, SlidGroups).
 
 row_slideRight(Row, NewRow) :-
-    append(Row, ['#'], RowAppended),
-    row_group_hash(RowAppended, Groups),
+    row_group_hash(Row, Groups),
     groups_slideRight(Groups, SlidGroups),
     maplist(string_chars, SlidGroupsStr, SlidGroups),
     join_strings(SlidGroupsStr, "#", NewRowStr),
-    string_chars(NewRowStr, NewRowT),
-    head(NewRowT, NewRow).
+    string_chars(NewRowStr, NewRow).
 row_slideLeft(Row, NewRow) :-
     reverse(Row, RowReversed),
     row_slideRight(RowReversed, NewRowReversed),
