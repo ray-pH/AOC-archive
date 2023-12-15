@@ -13,12 +13,14 @@ center_id = len(stars[0]) // 2
 nexp = len(stars)
 
 frame = 300
-fig, ax = plt.subplots() # type: ignore
+bgcolor = "#0f0f23"
+fig, ax = plt.subplots(facecolor=bgcolor) # type: ignore
 ax : plt.Axes = ax
+ax.set_facecolor(bgcolor)
 
 # axis = plt.axes()
 x0data, y0data = zip(*stars[1])
-scat = ax.scatter(x0data, y0data, s=100)
+scat = ax.scatter(x0data, y0data, s=100, c="#ffff66")
 
 def animate(i):
     expansionlevel = i / frame * (nexp-1)
@@ -48,13 +50,15 @@ def animate(i):
 
     ax.set_xlim(minx, maxx)
     ax.set_ylim(miny, maxy)
-    ax.set_title(f'Expansion level: {expansionlevel+1:.2f}')
+    ax.set_title(f'Expansion factor: {expansionlevel+1:.2f}')
     return scat,
 
 anim = animation.FuncAnimation(fig, animate, frames=frame, interval=24)
 plt.grid(alpha=0.2)
-plt.show()
-# anim.save('vis.gif', fps=24)
+# plt.show()
+# anim.save('vis.gif', fps=24, savefig_kwargs={'facecolor':bgcolor})
+anim.save('vis18.gif', fps=18, savefig_kwargs={'facecolor':bgcolor})
+anim.save('vis12.gif', fps=12, savefig_kwargs={'facecolor':bgcolor})
 
 
 
