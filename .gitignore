@@ -8,3 +8,4 @@ AOC2023/**/*.dot
 AOC2023/**/*.gif
 AOC2023/**/_*
 stats/stats_*.txt
+stats/__pycache__
