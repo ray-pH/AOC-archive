@@ -25,6 +25,15 @@ maplist_debug(Pred, [A|As], [B|Bs]) :-
     write(A), nl, write(" -> "), writeln(B),
     % debug
     maplist_debug(Pred, As, Bs).
+map3_debug(_, [], _, []).
+map3_debug(Pred, [A|As], B, [C|Cs]) :-
+    call(Pred, A, B, C),
+    % debug
+    length(As, Len), write("---------------------"), 
+    write("Remaining: "), writeln(Len),
+    write(A), nl, write(" -> "), writeln(C),
+    % debug
+    map3_debug(Pred, As, B, Cs).
 
 map3(_, [], _, []).
 map3(Pred, [A|As], B, [C|Cs]) :-
