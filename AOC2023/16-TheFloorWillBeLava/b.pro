@@ -96,12 +96,4 @@ main :-
     write(EnergizedCounts), nl,
     max_list(EnergizedCounts, MaxEnergizedCount),
     write(MaxEnergizedCount), nl,
-    % StartPos = (0,-1),
-    % StartDir = '>',
-    % Beams = [StartPos-StartDir],
-    % %
-    % step(Beams, Layout, BeamHistory),
-    % get_energized_count(BeamHistory, EnergizedCount),
-    % write(EnergizedCount), nl,
-    %
     nl.
