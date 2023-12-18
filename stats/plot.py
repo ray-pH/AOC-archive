@@ -33,6 +33,18 @@ def plot_silverperc_bar(year : int):
     silverperc = [s/t * 100 for s,t in zip(silver,total)]
     plt.bar(day, silverperc, label=f"{year}")
     plt.xticks(day, day)
+def plot_droprate(year : int):
+    day, _, _, total = getdata(year)
+    day = day[:-1]
+    droprate = [(1 - t1/t2)*100 for t1,t2 in zip(total, total[1:])]
+    plt.bar(day, droprate, label=f"{year}")
+    plt.xticks(day, day)
+def plot_gold_droprate(year : int):
+    day, gold, _, _ = getdata(year)
+    day = day[:-1]
+    droprate = [(1 - t1/t2)*100 for t1,t2 in zip(gold, gold[1:])]
+    plt.bar(day, droprate, label=f"{year}")
+    plt.xticks(day, day)
 
 def call_plotfunction(f, years : list, ylabel : str):
     plt.clf()
@@ -52,3 +64,5 @@ call_plotfunction(plot_silverperc, years, "percentage of users who only solved p
 
 call_plotfunction(plot_bar, [2023], "Solver count")
 call_plotfunction(plot_silverperc_bar, [2023], "percentage of users who only solved part 1 (%)")
+call_plotfunction(plot_droprate, [2023], "Drop rate (%)")
+call_plotfunction(plot_gold_droprate, [2023], "Gold Drop rate (%)")
