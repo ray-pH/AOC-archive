@@ -26,7 +26,7 @@ row_slideRight(Row, NewRow) :-
     maplist(string_chars, SlidGroupsStr, SlidGroups),
     join_strings(SlidGroupsStr, "#", NewRowStr),
     string_chars(NewRowStr, NewRowT),
-    head(NewRowT, NewRow).
+    init(NewRowT, NewRow).
 row_slideLeft(Row, NewRow) :-
     reverse(Row, RowReversed),
     row_slideRight(RowReversed, NewRowReversed),

@@ -4,7 +4,7 @@
 parse_network(Line, [Name,Left,Right]) :-
     split_string(Line, "=", " ", [Name, RestStr]),
     string_chars(RestStr, RestChars),
-    tail(RestChars, RTail), head(RTail, RightChars),
+    tail(RestChars, RTail), init(RTail, RightChars),
     string_chars(RightStr, RightChars),
     split_string(RightStr, ",", " ", [Left, Right]).
 
