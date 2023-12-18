@@ -9,7 +9,7 @@ vec_sub([],[],[]).
 vec_sub([A|As], [B|Bs], [C|Cs]) :- C is A - B, vec_sub(As, Bs, Cs).
 
 generate_diff_single(Numbers, Diff) :-
-    head(Numbers, Head),
+    init(Numbers, Head),
     tail(Numbers, Tail),
     vec_sub(Tail, Head, Diff).
 

@@ -47,8 +47,8 @@ zip([A|As], [B|Bs], [[A,B]|Cs]) :-
 
 tail([_|Tail], Tail).
 
-head([_],[]).
-head([H|Hs], [H|RestHead]) :- head(Hs, RestHead).
+init([_],[]).
+init([I|Is], [I|RestInit]) :- init(Is, RestInit).
 
 count(Elem, List, Count) :-
     count(Elem, List, 0, Count).
