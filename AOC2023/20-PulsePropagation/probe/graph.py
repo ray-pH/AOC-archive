@@ -37,6 +37,7 @@ def generate_graph(network):
         if name == 'broadcaster' : 
             for i,t in enumerate(targets):
                 if t not in addednode: add_node('b', t)
+                add_node('b', name+str(i))
                 graph.add_edge(pydot.Edge(name+str(i), t, color=grcolor1))
             continue
         for t in targets:
