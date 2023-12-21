@@ -108,6 +108,14 @@ flatten1([C|Cs], Flattened) :-
     flatten1(Cs, FlattenedRest),
     append(C, FlattenedRest, Flattened).
 
+unique([], []).
+unique([H|T], [H|Rest]) :-
+    \+ member(H, T),
+    unique(T, Rest).
+unique([H|T], Rest) :-
+    member(H, T),
+    unique(T, Rest).
+
 join_strings([], "").
 join_strings([S], S).
 join_strings([S1, S2|Ss], Joined) :-
