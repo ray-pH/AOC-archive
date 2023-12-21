@@ -1,0 +1,154 @@
+In the input file, there is a diamond that will repeats
+the "end point" (noted 5 in probe2.txt) repeats every 131 (length of the map) step with the initial location of 65
+X = 65 + 131 * n
+
+The question is asking about 26501365th step,
+which satisty
+26501365 = 65 + 131 * n
+n = 202300
+
+what i need to figure out now is how many odd and even '.' in each section (middle, topleft, topright, bottomleft, bottomright)
+:: Total 2364
+Top Left: 287
+Top Right: 278
+Bot Left: 290
+Bot Right: 280
+Corner: 1135
+Center: 1229
+
+:: Even-Odd
+Top Left: 140-147
+Top Right: 151-127
+Bot Left: 140-150
+Bot Right: 127-153
+Corner: 558-577
+Center: 628-601
+
+figure out the diamond pattern
+m = 0        m = 1         m = 2
+                             x
+               x            x x  
+  x           x x          x x x
+               x            x x
+                             x
+
+f(m) = (m+1) + 2*T(m)
+T(m) = m*(m+1)/2 : triangle number
+
+
+when expanding the gread, each adjacent `cell` will have its parity flipped
+X = 65 + 131 * n
+#CenterSame = f(n)
+#CenterFlipped = f(n-1)
+#Corner = 4 * T(n)
+
+# in general
+total covered tile : f(s) = f(65 + 131n)
+Ceven = f(n-1)
+Codd = f(n)
+Center = Ceven*K1 + Codd*K2 = f(n-1)*K1 + f(n)*K2
+X = 4 T(n)
+Xorner = K3 * T(n)
+
+res = f(65 + 131n) - Center - Xorner
+res = f(65 + 131n) - f(n-1)*K1 + f(n)*K2 - T(n)*K3
+-> quaratic on n
+n=0 :  3755
+n=1 : 33494
+n=2 : 92811
+-> solve quadratic equation
+f(n) = a*n^2 + b*n + c
+a = 14_789
+b = 14_950
+c =  3_755
+->
+f(202300) = 605247138198755
+
+
+
+# sanity check for step = 65
+using b.pro we get 3755-3594 (last = 3755)
+using formula:
+   f(65) = 66 + 2*T(65) = 66 + 2*2145 = 4356
+   subtract odd center
+   result = 4356 - 601 = 3755
+
+   :: try use general formula
+   total covered tile : f(65) = 66 + 2*T(65) = 66 + 2*2145 = 4356
+   ::
+   last center = normal (even)
+   last parity = odd
+   Csame = f(0) = 1
+   Cdiff = f(-1) = 0
+   -- last center normal ->
+   Cnorm = Csame = 1
+   Cflip = Cdiff = 0
+   -- need to remove odd
+   Ceven = Cflip = 0 (Cdiff)
+   Codd = Cnorm = 1  (Csame)
+   -- calculate
+   Center = 0*628 + 1*601 = 601
+   ::
+   X = 4 T(0) = 0
+   Xorner = 0
+   ::
+   result = 4356 - 601 - 0 = 3755
+
+
+# sanity check for n = 1 : step = 65 + 1*131 = 196 
+using b.pro we get 33494-33009 (last = 33494)
+using formula:
+    total covered tile : f(196) = 197 + 2*T(196) = 38809
+    ::
+    last center = flipped (odd)
+    last parity = even
+    Csame = f(1) = 4
+    Cdiff = f(0) = 1
+    -- last center flipped ->
+    Cnorm = Cdiff = 1
+    Cflip = Csame = 4
+    -- need to remove even ->
+    Ceven = Cnorm = 1 (Cdiff)
+    Codd = Cflip = 4  (Csame)
+    -- calculate
+    Center = 1*628 + 4*601 = 3032
+    ::
+    X = 4 T(1) = 4 * 1 = 4
+    Xorner = 4 * 1135 = 4540
+    ::
+    retult = 38809 - 3032 - 4540 = 31237
+
+# sanity check for n = 2 : step = 65 + 2*131 = 327
+using b.pro we get 92811-92002 (last = 92811)
+using formula:
+    total covered tile : f(327) = 107584
+    ::
+    last center = normal (even)
+    last parity = odd
+    Csame = f(2) = 9
+    Cdiff = f(1) = 4
+    -- last center normal ->
+    Cnorm = Csame = 9
+    Cflip = Cdiff = 4
+    -- need to remove odd ->
+    Ceven = Cflip = 4 (Cdiff)
+    Codd = Cnorm = 9  (Csame)
+    -- calculate
+    Center = 4*628 + 9*601 = 7921
+    ::
+    X = 4 T(2) = 4 * 3 = 12
+    Xorner = 12 * 1135 = 13620
+    ::
+    retult = 38809 - 3032 - 4540 = 86043
+
+
+
+:: Even-Odd
+Top Left: 140-147
+Top Right: 151-127
+Bot Left: 140-150
+Bot Right: 127-153
+Corner: 558-577
+Center: 628-601
+Total : 1186-1178
+
