@@ -15,6 +15,7 @@ w = Int('w')
 t0 = Int('t0')
 t1 = Int('t1')
 t2 = Int('t2')
+t3 = Int('t3')
 
 s = Solver()
 for st in eqstr: 

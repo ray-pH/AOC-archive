@@ -22,7 +22,7 @@ write_numdata_eqstring(Num-Data) :-
 main :-
     % read_file_lines('./inpex.txt', Lines),
     read_file_lines('./input.txt', Lines), 
-    take(3, Lines, Lines3),
+    take(4, Lines, Lines3),
     maplist(parse_line, Lines3, Data),
     enumerate(Data, EnumData),
     maplist(write_numdata_eqstring, EnumData).
