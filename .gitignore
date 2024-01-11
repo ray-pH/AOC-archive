@@ -7,5 +7,6 @@ AOC2023/**/*.svg
 AOC2023/**/*.dot
 AOC2023/**/*.gif
 AOC2023/**/_*
+./**/input.txt
 stats/stats_*.txt
 stats/__pycache__
