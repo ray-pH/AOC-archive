@@ -10,3 +10,6 @@ AOC2023/**/_*
 ./**/input.txt
 stats/stats_*.txt
 stats/__pycache__
+AOC2024/target
+AOC2024/inputs
+AOC2024/inputs
