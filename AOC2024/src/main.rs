@@ -1,20 +1,24 @@
 use std::fs; 
 use std::time::Instant;
 use colored::*;
-mod d1;
-
-type Solver = &'static dyn Fn(&String) -> String;
+mod d1; mod d2;
 
 fn main() {
     print_header();
     print_day(1);
     run(&d1::part1, "Part 1", "1.txt");
     run(&d1::part2, "Part 2", "1.txt");
+    
+    print_day(2);
+    run(&d2::part1, "Part 1", "2.txt");
+    run(&d2::part2, "Part 2", "2.txt");
 }
 
 fn print_day(num: usize) {
     println!("{}", format!("Day {num}").bold());
 }
+
+type Solver = &'static dyn Fn(&String) -> String;
 fn run(solver: Solver, name: &str, input_filename: &str) {
     let input_str = read_input(input_filename);
     let start = Instant::now();
