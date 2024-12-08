@@ -1,15 +1,15 @@
 use std::{cmp::Ordering, collections::HashSet};
 
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let (rules, pages_arr) = parse_input(input);
     let result: usize = pages_arr.iter()
         .filter(|pages| is_valid(&rules, pages))
-        .map(|pages| get_middle_page(pages))
+        .map(get_middle_page)
         .sum();
     return result.to_string();
 }
 
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let (rules, pages_arr) = parse_input(input);
     let mut invalid_pages = pages_arr.iter()
         .filter(|pages| !is_valid(&rules, pages))
@@ -17,7 +17,7 @@ pub fn part2(input: &String) -> String {
     for pages in invalid_pages.iter_mut() {
         pages.sort_by(|a,b| if rules.contains(&(*a,*b)) { Ordering::Greater } else { Ordering::Less });
     }
-    let result: usize = invalid_pages.iter().map(|pages| get_middle_page(pages)).sum();
+    let result: usize = invalid_pages.iter().map(get_middle_page).sum();
     return result.to_string();
 }
 
@@ -32,7 +32,7 @@ fn get_middle_page(pages: &Pages) -> usize {
 
 type Rules = HashSet<(usize,usize)>;
 type Pages = Vec<usize>;
-fn parse_input(input: &String) -> (Rules, Vec<Pages>) {
+fn parse_input(input: &str) -> (Rules, Vec<Pages>) {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let rules: Rules = HashSet::from_iter(
         parts[0].lines()

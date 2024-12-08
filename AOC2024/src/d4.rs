@@ -1,4 +1,4 @@
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let b = parse_input(input);
     let mut count = 0;
     for row in 0..b.height {
@@ -11,7 +11,7 @@ pub fn part1(input: &String) -> String {
     return count.to_string();
 }
 
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let mut count = 0;
     let b = parse_input(input);
     for row in 1..b.height-1 {
@@ -35,6 +35,7 @@ fn count_xmas(b: &Board, row: i32, col: i32) -> i32 {
     DIRS.map(|(row_dir, col_dir)| is_xmas_dir(b, row, col, row_dir, col_dir))
         .iter().filter(|bool| **bool).count() as i32
 }
+#[allow(clippy::identity_op)]
 fn is_xmas_dir(b: &Board, row: i32, col: i32, row_dir: i32, col_dir: i32) -> bool {
     let row_final = row + 3 * row_dir;
     let col_final = col + 3 * col_dir;
@@ -56,7 +57,7 @@ fn is_ms_or_sm((a,b): (&char, &char)) -> bool {
     (*a == 'M' && *b == 'S') || (*a == 'S' && *b == 'M')
 }
 
-fn parse_input(input: &String) -> Board {
+fn parse_input(input: &str) -> Board {
     let board = input.lines()
         .map(|line| line.chars().collect())
         .collect::<Vec<Vec<char>>>();

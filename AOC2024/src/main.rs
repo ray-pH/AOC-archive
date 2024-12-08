@@ -1,3 +1,5 @@
+#![allow(clippy::needless_return)]
+
 use std::fs; 
 use std::time::Instant;
 use colored::*;
@@ -47,7 +49,7 @@ fn print_day(num: usize) {
     println!("{}", format!("Day {num}").bold());
 }
 
-type Solver = &'static dyn Fn(&String) -> String;
+type Solver = &'static dyn Fn(&str) -> String;
 fn run(solver: Solver, name: &str, input_filename: &str) {
     let input_str = read_input(input_filename);
     let start = Instant::now();
@@ -58,7 +60,7 @@ fn run(solver: Solver, name: &str, input_filename: &str) {
 
 fn read_input(filename: &str) -> String {
     let full_path = format!("inputs/{}", filename);
-    return fs::read_to_string(full_path).expect("Could not read file");
+    fs::read_to_string(full_path).expect("Could not read file")
 }
 fn formatted_duration(duration: std::time::Duration) -> String {
     if duration.as_secs() > 0 {

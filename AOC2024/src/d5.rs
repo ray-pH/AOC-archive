@@ -1,23 +1,23 @@
 #![allow(dead_code)]
 use std::collections::{HashMap, HashSet};
 
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let (rules, pages_arr) = parse_input(input);
     let srule = simplify_rule(&rules);
     let result: usize = pages_arr.iter()
         .filter(|pages| is_pages_valid(&srule, pages))
-        .map(|pages| get_middle_page(pages))
+        .map(get_middle_page)
         .sum();
     return result.to_string();
 }
 
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let (rules, pages_arr) = parse_input(input);
     let srule = simplify_rule(&rules);
     let invalid_pages_arr: Vec<Pages> = pages_arr.into_iter().filter(|pages| !is_pages_valid(&srule, pages)).collect();
     
     let result: usize = invalid_pages_arr.iter()
-        .map(|pages| filter_usable_rules(&rules, &pages))
+        .map(|pages| filter_usable_rules(&rules, pages))
         .map(|r| generate_ordering(&r))
         .map(|ordering| get_middle_page(&ordering))
         .sum();
@@ -58,17 +58,17 @@ fn get_middle_page(pages: &Pages) -> usize {
     return pages[middle];
 }
 
-fn filter_usable_rules(rules: &Vec<Rule>, pages: &Pages) -> Vec<Rule> {
-    let pages_set: HashSet<usize> = HashSet::from_iter(pages.into_iter().cloned());
+fn filter_usable_rules(rules: &[Rule], pages: &Pages) -> Vec<Rule> {
+    let pages_set: HashSet<usize> = HashSet::from_iter(pages.iter().cloned());
     return rules.iter().filter(|(a,b)| pages_set.contains(a) && pages_set.contains(b)).cloned().collect();
 }
 
-fn generate_ordering(rules: &Vec<Rule>) -> Vec<usize> {
-    let mut pool = rules.clone();
+fn generate_ordering(rules: &[Rule]) -> Vec<usize> {
+    let mut pool = rules.to_owned();
     let mut ordering = Vec::new();
     while pool.len() > 1 {
         let smallest = get_smallest(&pool);
-        pool = pool.iter().filter(|(a,_)| a != &smallest).cloned().collect();
+        pool.retain(|(a,_)| a != &smallest);
         ordering.push(smallest);
     }
     let (final_a,final_b) = pool[0];
@@ -80,13 +80,13 @@ fn generate_ordering(rules: &Vec<Rule>) -> Vec<usize> {
 fn get_smallest(rules: &Vec<Rule>) -> usize {
     let mut possible_smallest: HashSet<usize> = HashSet::from_iter(rules.iter().map(|(a,_)| *a));
     for (_,b) in rules {
-        possible_smallest.remove(&b);
+        possible_smallest.remove(b);
     }
     assert!(possible_smallest.len() == 1);
     return *possible_smallest.iter().next().unwrap();
 }
 
-fn parse_input(input: &String) -> (Vec<Rule>, Vec<Pages>) {
+fn parse_input(input: &str) -> (Vec<Rule>, Vec<Pages>) {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let rules: Vec<Rule> = parts[0].lines()
         .map(|line| line.split("|").collect::<Vec<&str>>())

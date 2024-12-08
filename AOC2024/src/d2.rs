@@ -1,11 +1,11 @@
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let reports = parse_input(input);
     return reports.iter()
         .filter(|report| is_safe(report))
         .count().to_string()
 }
 
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let reports = parse_input(input);
     return reports.iter()
         .filter(|report| is_safe_after_removing_one(report))
@@ -24,7 +24,7 @@ fn is_always_increasing(arr: &[i32]) -> bool {
 fn is_safe_diff(arr: &[i32]) -> bool {
     arr.windows(2).all(|w| {
         let diff = (w[1] - w[0]).abs();
-        diff >= 1 && diff <= 3
+        (1..=3).contains(&diff)
     })
 }
 
@@ -36,7 +36,7 @@ fn is_safe_after_removing_one(arr: &[i32]) -> bool {
     (0..arr.len()).any(|i| is_safe(&iter_skip_index(arr, i)))
 }
 
-fn parse_input(input: &String) -> Vec<Vec<i32>> {
+fn parse_input(input: &str) -> Vec<Vec<i32>> {
     return input.lines()
         .map(|line| line.split_whitespace().map(|x| x.parse::<i32>().unwrap()).collect())
         .collect()

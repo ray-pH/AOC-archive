@@ -1,13 +1,13 @@
 use std::iter::zip;
 
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let (mut left, mut right) = parse_input(input);
     left.sort();
     right.sort();
     let result = zip(left, right).map(|(a, b)| (a-b).abs()).sum::<i32>();
     return result.to_string();
 }
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let (left, right) = parse_input(input);
     let result = left.iter()
         .map(|x| x * right.iter().filter(|y| &x == y).count() as i32)
@@ -15,7 +15,7 @@ pub fn part2(input: &String) -> String {
     return result.to_string();
 }
 
-fn parse_input(input: &String) -> (Vec<i32>, Vec<i32>) {
+fn parse_input(input: &str) -> (Vec<i32>, Vec<i32>) {
     let mut left = Vec::new();
     let mut right = Vec::new();
     for line in input.lines() {

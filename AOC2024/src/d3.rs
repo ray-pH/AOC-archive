@@ -1,6 +1,6 @@
 use regex::Regex;
 
-pub fn part1(input: &String) -> String {
+pub fn part1(input: &str) -> String {
     let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
     let result = re.captures_iter(input)
         .map(|args| args[1].parse::<i32>().unwrap() * args[2].parse::<i32>().unwrap())
@@ -8,7 +8,7 @@ pub fn part1(input: &String) -> String {
     result.to_string()
 }
 
-pub fn part2(input: &String) -> String {
+pub fn part2(input: &str) -> String {
     let re = Regex::new(r"mul\(\d+,\d+\)|(do\(\))|(don't\(\))").unwrap();
     let mut result = 0;
     let mut is_active = true;
