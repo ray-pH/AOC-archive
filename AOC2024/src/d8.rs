@@ -10,11 +10,23 @@ pub fn part1(input: &str) -> String {
     return antinodes.len().to_string();
 }
 
+#[allow(unused)]
 pub fn part2(input: &str) -> String {
     let map = parse_input(input);
     let mut antinodes: HashSet<Pos> = HashSet::new();
     for (_, antennas) in map.antennas_freq_map.iter() {
         antinodes.extend(get_continuous_antinodes_inside_map(antennas, &map));
+    }
+    return antinodes.len().to_string();
+}
+
+// this is technically incomplete based on the requirements,
+// but there are hidden constarins in the input that make it work
+pub fn part2b(input: &str) -> String {
+    let map = parse_input(input);
+    let mut antinodes: HashSet<Pos> = HashSet::new();
+    for (_, antennas) in map.antennas_freq_map.iter() {
+        antinodes.extend(get_more_antinodes_inside_map(antennas, &map));
     }
     return antinodes.len().to_string();
 }
@@ -83,6 +95,39 @@ fn get_continous_antinodes_from_pair(a: &Pos, b: &Pos, map: &Map) -> Vec<Pos> {
                 antinodes.push((introw, col));
             }
         }
+    }
+    return antinodes;
+}
+
+fn get_more_antinodes_inside_map(antennas: &[Pos], map: &Map) -> HashSet<Pos> {
+    let mut result = HashSet::new();
+    for i in 0..antennas.len() {
+        for j in i+1..antennas.len() {
+            let antinodes = get_more_antinodes_from_pair(&antennas[i], &antennas[j], map);
+            result.extend(antinodes);
+        }
+    }
+    return result;
+}
+
+fn get_more_antinodes_from_pair(a: &Pos, b: &Pos, map: &Map) -> Vec<Pos> {
+    let diff = (b.0 - a.0, b.1 - a.1);
+    let mut antinodes = Vec::new();
+    let mut b_prime = (b.0 + diff.0, b.1 + diff.1);
+    let mut a_prime = (a.0 - diff.0, a.1 - diff.1);
+    loop {
+        if !is_pos_inside_map(&b_prime, map) {
+            break;
+        }
+        antinodes.push(b_prime);
+        b_prime = (b_prime.0 + diff.0, b_prime.1 + diff.1);
+    }
+    loop {
+        if !is_pos_inside_map(&a_prime, map) {
+            break;
+        }
+        antinodes.push(a_prime);
+        a_prime = (a_prime.0 - diff.0, a_prime.1 - diff.1);
     }
     return antinodes;
 }

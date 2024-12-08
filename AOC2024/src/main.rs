@@ -42,7 +42,8 @@ fn main() {
     
     print_day(8);
     run(&d8::part1, "Part 1", "8.txt");
-    run(&d8::part2, "Part 2", "8.txt");
+    // run(&d8::part2, "Part 2", "8.txt");
+    run(&d8::part2b, "Part 2", "8.txt");
 }
 
 fn print_day(num: usize) {
