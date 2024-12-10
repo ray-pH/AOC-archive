@@ -5,7 +5,7 @@ use std::time::Instant;
 use colored::*;
 mod utils;
 mod d1; mod d2; mod d3; mod d4; mod d5; mod d5b;
-mod d6; mod d7; mod d8; mod d9;
+mod d6; mod d7; mod d8; mod d9; mod d10;
 
 fn main() {
     print_header();
@@ -48,6 +48,10 @@ fn main() {
     print_day(9);
     run(&d9::part1, "Part 1", "9.txt");
     run(&d9::part2, "Part 2", "9.txt");
+    
+    print_day(10);
+    run(&d10::part1, "Part 1", "10.txt");
+    run(&d10::part2, "Part 2", "10.txt");
 }
 
 fn print_day(num: usize) {
