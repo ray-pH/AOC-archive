@@ -18,7 +18,7 @@ pub fn part2(input: &str) -> String {
     for dir in dirs.iter() {
         can_move_cache.clear();
         let player_pos = mapdata.player;
-        let (_, npos) = try_move2(&mut mapdata, player_pos, &dir, &mut can_move_cache);
+        let (_, npos) = try_move2(&mut mapdata, player_pos, dir, &mut can_move_cache);
         mapdata.player = npos;
         // println!("---------------------");
         // print_map(&mapdata);
@@ -34,22 +34,22 @@ pub fn part2(input: &str) -> String {
 // }
 
 type Pos = (i32,i32);
-enum Dir { UP, DOWN, LEFT, RIGHT }
+enum Dir { Up, Down, Left, Right }
 impl Dir {
     pub fn to_tuple(&self) -> Pos {
         match self {
-            Dir::UP => (-1, 0),
-            Dir::DOWN => (1, 0),
-            Dir::LEFT => (0, -1),
-            Dir::RIGHT => (0, 1),
+            Dir::Up => (-1, 0),
+            Dir::Down => (1, 0),
+            Dir::Left => (0, -1),
+            Dir::Right => (0, 1),
         }
     }
     pub fn from_char(c: char) -> Option<Self> {
         match c {
-            '^' => Some(Dir::UP),
-            'v' => Some(Dir::DOWN),
-            '>' => Some(Dir::RIGHT),
-            '<' => Some(Dir::LEFT),
+            '^' => Some(Dir::Up),
+            'v' => Some(Dir::Down),
+            '>' => Some(Dir::Right),
+            '<' => Some(Dir::Left),
             _ => None
         }
     }
@@ -111,14 +111,14 @@ fn can_move_to2(map: &MapData, pos: Pos, dir: &Dir, can_move_cache: &mut HashSet
             let to = (pos.0 + diff.0, pos.1 + diff.1);
             let pairto = (to.0, to.1 + 1);
             match dir {
-                Dir::UP | Dir::DOWN => {
+                Dir::Up | Dir::Down => {
                     can_move_to2(map, to, dir, can_move_cache) && 
                     can_move_to2(map, pairto, dir, can_move_cache)
                 }
-                Dir::LEFT => {
+                Dir::Left => {
                     can_move_to2(map, to, dir, can_move_cache)
                 }
-                Dir::RIGHT => {
+                Dir::Right => {
                     can_move_to2(map, pairto, dir, can_move_cache)
                 }
             }
@@ -155,7 +155,7 @@ fn try_move2(map: &mut MapData, from: Pos, dir: &Dir, can_move_cache: &mut HashS
             let pairfrom = (from.0, from.1 + 1);
             let pairto = (to.0, to.1 + 1);
             match dir {
-                Dir::UP | Dir::DOWN => {
+                Dir::Up | Dir::Down => {
                     if can_move_to2(map, to, dir, can_move_cache) && can_move_to2(map, pairto, dir, can_move_cache) {
                         try_move2(map, to, dir, can_move_cache);
                         try_move2(map, pairto, dir, can_move_cache);
@@ -168,7 +168,7 @@ fn try_move2(map: &mut MapData, from: Pos, dir: &Dir, can_move_cache: &mut HashS
                         (false, from)
                     }
                 }
-                Dir::LEFT => {
+                Dir::Left => {
                     if can_move_to2(map, to, dir, can_move_cache) {
                         try_move2(map, to, dir, can_move_cache);
                         map.map[to.0 as usize][to.1 as usize] = '[';
@@ -180,7 +180,7 @@ fn try_move2(map: &mut MapData, from: Pos, dir: &Dir, can_move_cache: &mut HashS
                         (false, from)
                     }
                 }
-                Dir::RIGHT => {
+                Dir::Right => {
                     if can_move_to2(map, pairto, dir, can_move_cache) {
                         try_move2(map, pairto, dir, can_move_cache);
                         map.map[pairto.0 as usize][pairto.1 as usize] = ']';
@@ -226,9 +226,9 @@ fn parse_input(input: &str) -> (MapData, Vec<Dir>) {
     let row_count = map.len() as i32;
     let col_count = map[0].len() as i32;
     let mut player = (0, 0);
-    for row in 0..row_count as usize {
-        for col in 0..col_count as usize {
-            if map[row][col] == '@' {
+    for (row, line) in map.iter().enumerate() {
+        for (col, c) in line.iter().enumerate() {
+            if *c == '@' {
                 player = (row as i32, col as i32);
             }
         }
