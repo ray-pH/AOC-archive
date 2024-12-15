@@ -47,3 +47,7 @@ where
         }
     }
 }
+
+pub fn positive_mod(a: isize, b: isize) -> isize {
+    (a % b + b) % b
+}

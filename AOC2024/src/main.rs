@@ -6,7 +6,7 @@ use colored::*;
 mod utils;
 mod d1; mod d2; mod d3; mod d4; mod d5; mod d5b;
 mod d6; mod d7; mod d8; mod d9; mod d10;
-mod d11; mod d11b; mod d12; mod d13;
+mod d11; mod d11b; mod d12; mod d13; mod d14;
 
 fn main() {
     print_header();
@@ -65,6 +65,10 @@ fn main() {
         print_day(13);
         run(&d13::part1, "Part 1", "13.txt");
         run(&d13::part2, "Part 2", "13.txt");
+        
+        print_day(14);
+        run(&d14::part1, "Part 1", "14.txt");
+        run(&d14::part2, "Part 2", "14.txt");
     }
 }
 
