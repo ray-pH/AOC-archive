@@ -23,7 +23,7 @@ pub fn part2(input: &str) -> String {
         // insight from exploring the images
         let mut c36 = 0;
         let mut c68 = 0;
-        for (_, row) in img.iter().enumerate() {
+        for row in img.iter() {
             for (x, pixel) in row.iter().enumerate() {
                 if x == 36 && *pixel == 255 { c36 += 1; }
                 if x == 68 && *pixel == 255 { c68 += 1; }
