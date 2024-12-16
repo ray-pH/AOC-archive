@@ -7,11 +7,8 @@ pub fn part1(input: &str) -> String {
 }
 pub fn part2(input: &str) -> String {
     let map = parse_input(input);
-    let (path, _) = a_star(&map).unwrap();
-    let (mut cost_map, explorers) = generate_cost_map_exp(path);
-    let coords = get_all_optimal_points(&map, &mut cost_map, explorers);
-    let mut points: HashSet<(isize, isize)> = HashSet::from_iter(coords.iter().map(|c| (c.0, c.1)));
-    points.insert(map.goal);
+    let points = a_star_all_points(&map);
+    let points: HashSet<(isize, isize)> = HashSet::from_iter(points.iter().map(|c| (c.0, c.1)));
     return points.len().to_string();
 }
 
@@ -68,18 +65,83 @@ where
         }
         for (neigh, cost) in graph.get_neighbors(&current.pos) {
             let tentative_g_score = g_score[&current.pos] + cost;
-            if tentative_g_score <= *g_score.get(&neigh).unwrap_or(&std::isize::MAX) {
+            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&isize::MAX) {
                 came_from.insert(neigh.clone(), current.pos.clone());
                 g_score.insert(neigh.clone(), tentative_g_score);
                 open_set.push(Node {
                     pos: neigh.clone(),
                     cost: tentative_g_score,
-                    est_cost: tentative_g_score + graph.get_heutistic(&neigh),
+                    est_cost: tentative_g_score + graph.get_heutistic(neigh),
                 });
             }
         }
     }
     return None;
+}
+
+fn a_star_all_points<T>(graph: &impl AStarGraph<T>) -> HashSet<T>
+where
+    T: Eq + std::hash::Hash + Clone + std::fmt::Debug,
+{
+    let mut open_set: BinaryHeap<Node<T>> = BinaryHeap::new();
+    let mut came_from: HashMap<T, (Vec<T>, isize)> = HashMap::new();
+    let mut g_score: HashMap<T, isize> = HashMap::new();
+    let mut goals: HashSet<T> = HashSet::new();
+    let mut points: HashSet<T> = HashSet::new();
+    
+    let start = graph.get_start();
+    open_set.push(Node {
+        pos: start.clone(),
+        cost: 0,
+        est_cost: graph.get_heutistic(&start),
+    });
+    g_score.insert(start, 0);
+    
+    while let Some(current) = open_set.pop() {
+        if graph.is_goal(&current.pos) {
+            goals.insert(current.pos.clone());
+        }
+        for (neigh, cost) in graph.get_neighbors(&current.pos) {
+            let tentative_g_score = g_score[&current.pos] + cost;
+            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&isize::MAX) {
+                g_score.insert(neigh.clone(), tentative_g_score);
+                open_set.push(Node {
+                    pos: neigh.clone(),
+                    cost: tentative_g_score,
+                    est_cost: tentative_g_score + graph.get_heutistic(neigh),
+                });
+                // came_from.insert(neigh.clone(), current.pos.clone());
+                // let came_from_data = came_from.get(&neigh);
+                if let Some(came_from_data) = came_from.get_mut(neigh) {
+                    #[allow(clippy::comparison_chain)]
+                    if came_from_data.1 == tentative_g_score {
+                        // same, add
+                        came_from_data.0.push(current.pos.clone());
+                    } else if came_from_data.1 > tentative_g_score {
+                        // overwrite
+                        came_from.insert(neigh.clone(), (vec![current.pos.clone()], tentative_g_score));
+                    }
+                } else {
+                    came_from.insert(neigh.clone(), (vec![current.pos.clone()], tentative_g_score));
+                }
+            }
+        }
+    }
+    
+    let mut heads: Vec<T> = goals.iter().cloned().collect();
+    let mut visited_heads: HashSet<T> = HashSet::new();
+    while let Some(head) = heads.pop() {
+        if visited_heads.contains(&head) {
+            continue;
+        }
+        visited_heads.insert(head.clone());
+        if let Some((froms, _)) = came_from.get(&head) {
+            heads.extend(froms.iter().cloned());
+            points.insert(head);
+        }
+    }
+    
+    return points;
 }
 
 
@@ -106,58 +168,6 @@ impl AStarGraph<Coord> for Map {
     fn is_goal(&self, node: &Coord) -> bool {
         node.0 == self.goal.0 && node.1 == self.goal.1
     }
-}
-
-struct Explorer {
-    cost: isize,
-    path: Vec<Coord>,
-}
-fn generate_cost_map_exp(path: Vec<Coord>) -> (HashMap<Coord, isize>, Vec<Explorer>) {
-    let mut cost_map = HashMap::new();
-    let mut explorers = Vec::new();
-    cost_map.insert(path[0], 0);
-    explorers.push(Explorer { cost: 0, path: vec![path[0].clone()]});
-    for w in path.windows(2) {
-        let a = w[0];
-        let b = w[1];
-        let prev_cost = cost_map[&a];
-        let d_cost = if a.2 == b.2 { 1 } else { 1000 };
-        let new_cost = prev_cost + d_cost;
-        explorers.push(Explorer { cost: new_cost, path: vec![b.clone()]});
-        cost_map.insert(b, new_cost);
-    }
-    return (cost_map, explorers);
-}
-
-fn get_all_optimal_points(graph: &impl AStarGraph<Coord>, cost_map: &mut HashMap<Coord, isize>, explorers: Vec<Explorer>) -> HashSet<Coord> {
-    let mut points = HashSet::new();
-    let mut explorers = explorers;
-    
-    let optimal_path_set: HashSet<Coord> = cost_map.keys().cloned().collect();
-    
-    while let Some(exp) = explorers.pop() {
-        let head = exp.path.last().unwrap();
-        for (neigh, cost) in graph.get_neighbors(head) {
-            let tentative_cost = exp.cost + cost;
-            let neigh_cost = cost_map.get(&neigh).unwrap_or(&std::isize::MAX);
-            if tentative_cost == *neigh_cost && optimal_path_set.contains(neigh) {
-                // inside optimal
-                points.extend(exp.path.iter());
-            }
-            else if tentative_cost <= *neigh_cost {
-                // new explorer
-                let mut new_path = exp.path.clone();
-                new_path.push(neigh.clone());
-                explorers.push(Explorer {
-                    cost: tentative_cost,
-                    path: new_path,
-                });
-                cost_map.insert(*neigh, tentative_cost);
-            }
-        }
-    }
-    
-    return points;
 }
 
 fn is_empty_char(c: char) -> bool {
