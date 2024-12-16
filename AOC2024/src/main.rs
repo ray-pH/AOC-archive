@@ -10,7 +10,7 @@ mod d11; mod d11b; mod d12; mod d13; mod d14; mod d15;
 
 fn main() {
     print_header();
-    if false {
+    if true {
         print_day(1);
         run(&d1::part1, "Part 1", "1.txt");
         run(&d1::part2, "Part 2", "1.txt");
@@ -69,11 +69,11 @@ fn main() {
         print_day(14);
         run(&d14::part1, "Part 1", "14.txt");
         run(&d14::part2, "Part 2", "14.txt");
+        
+        print_day(15);
+        run(&d15::part1, "Part 1", "15.txt");
+        run(&d15::part2, "Part 2", "15.txt");
     }
-    
-    print_day(15);
-    run(&d15::part1, "Part 1", "15.txt");
-    run(&d15::part2, "Part 2", "15.txt");
 }
 
 fn print_day(num: usize) {
