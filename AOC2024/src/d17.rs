@@ -27,7 +27,7 @@ struct Computer {
 impl Computer {
     fn combo(&self, val: usize) -> usize {
         match val {
-            0|1|2|3 => val,
+            0..=3 => val,
             4 => self.reg_a,
             5 => self.reg_b,
             6 => self.reg_c,
@@ -136,6 +136,7 @@ fn quick_eval(a: usize) -> usize {
     // let a = a >> 0b011;
     let b = b ^ c;
     let b = b ^ 0b110;
+    #[allow(clippy::let_and_return)]
     let out = b & 0b111;
     out
 }
