@@ -52,6 +52,20 @@ pub fn positive_mod(a: isize, b: isize) -> isize {
     (a % b + b) % b
 }
 
+pub fn starts_with<I>(mut iter: I, prefix: I) -> bool
+where
+    I: Iterator,
+    I::Item: PartialEq,
+{
+    for a in prefix {
+        match iter.next() {
+            Some(b) if a == b => continue,
+            _ => return false,
+        }
+    }
+    return true;
+}
+
 
 // T is the coordinate type
 #[derive(Debug, Clone, Eq, PartialEq)]

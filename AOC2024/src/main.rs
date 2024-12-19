@@ -7,7 +7,7 @@ mod utils;
 mod d01; mod d02; mod d03; mod d04; mod d05; mod d05b;
 mod d06; mod d07; mod d08; mod d09; mod d10;
 mod d11; mod d11b; mod d12; mod d13; mod d14; mod d15;
-mod d16; mod d17; mod d18;
+mod d16; mod d17; mod d18; mod d19;
 
 fn main() {
     print_header();
@@ -86,6 +86,10 @@ fn main() {
         print_day(18);
         run(&d18::part1, "Part 1", "18.txt");
         run(&d18::part2, "Part 2", "18.txt");
+        
+        print_day(19);
+        run(&d19::part1, "Part 1", "19.txt");
+        run(&d19::part2, "Part 2", "19.txt");
     }
     
 }
