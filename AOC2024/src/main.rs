@@ -4,8 +4,8 @@ use std::fs;
 use std::time::Instant;
 use colored::*;
 mod utils;
-mod d1; mod d2; mod d3; mod d4; mod d5; mod d5b;
-mod d6; mod d7; mod d8; mod d9; mod d10;
+mod d01; mod d02; mod d03; mod d04; mod d05; mod d05b;
+mod d06; mod d07; mod d08; mod d09; mod d10;
 mod d11; mod d11b; mod d12; mod d13; mod d14; mod d15;
 mod d16; mod d17; mod d18;
 
@@ -13,43 +13,43 @@ fn main() {
     print_header();
     if true {
         print_day(1);
-        run(&d1::part1, "Part 1", "1.txt");
-        run(&d1::part2, "Part 2", "1.txt");
+        run(&d01::part1, "Part 1", "01.txt");
+        run(&d01::part2, "Part 2", "01.txt");
         
         print_day(2);
-        run(&d2::part1, "Part 1", "2.txt");
-        run(&d2::part2, "Part 2", "2.txt");
+        run(&d02::part1, "Part 1", "02.txt");
+        run(&d02::part2, "Part 2", "02.txt");
         
         print_day(3);
-        run(&d3::part1, "Part 1", "3.txt");
-        run(&d3::part2, "Part 2", "3.txt");
+        run(&d03::part1, "Part 1", "03.txt");
+        run(&d03::part2, "Part 2", "03.txt");
         
         print_day(4);
-        run(&d4::part1, "Part 1", "4.txt");
-        run(&d4::part2, "Part 2", "4.txt");
+        run(&d04::part1, "Part 1", "04.txt");
+        run(&d04::part2, "Part 2", "04.txt");
         
         print_day(5);
-        // run(&d5::part1, "Part 1", "5.txt");
-        // run(&d5::part2, "Part 2", "5.txt");
-        run(&d5b::part1, "Part 1", "5.txt");
-        run(&d5b::part2, "Part 2", "5.txt");
+        // run(&d05::part1, "Part 1", "05.txt");
+        // run(&d05::part2, "Part 2", "05.txt");
+        run(&d05b::part1, "Part 1", "05.txt");
+        run(&d05b::part2, "Part 2", "05.txt");
         
         print_day(6);
-        run(&d6::part1, "Part 1", "6.txt");
-        run(&d6::part2, "Part 2", "6.txt");
+        run(&d06::part1, "Part 1", "06.txt");
+        run(&d06::part2, "Part 2", "06.txt");
         
         print_day(7);
-        run(&d7::part1, "Part 1", "7.txt");
-        run(&d7::part2, "Part 2", "7.txt");
+        run(&d07::part1, "Part 1", "07.txt");
+        run(&d07::part2, "Part 2", "07.txt");
         
         print_day(8);
-        run(&d8::part1, "Part 1", "8.txt");
-        // run(&d8::part2, "Part 2", "8.txt");
-        run(&d8::part2b, "Part 2", "8.txt");
+        run(&d08::part1, "Part 1", "08.txt");
+        // run(&d08::part2, "Part 2", "08.txt");
+        run(&d08::part2b, "Part 2", "08.txt");
         
         print_day(9);
-        run(&d9::part1, "Part 1", "9.txt");
-        run(&d9::part2, "Part 2", "9.txt");
+        run(&d09::part1, "Part 1", "09.txt");
+        run(&d09::part2, "Part 2", "09.txt");
         
         print_day(10);
         run(&d10::part1, "Part 1", "10.txt");
