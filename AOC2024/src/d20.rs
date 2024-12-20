@@ -1,17 +1,20 @@
 use std::collections::{HashMap, HashSet};
-
-use crate::utils::{a_star2, AStarGraph2};
+use crate::utils::{a_star, AStarGraph};
 
 pub fn part1(input: &str) -> String {
     let map = parse_input(input);
-    let (_, cost) = a_star2(&map).unwrap();
-    // let finished = explore_and_get_finished(&map, cost as usize);
-    let finished = explore_and_get_finished(&map, cost as usize - 100 + 1);
+    let (path, cost) = a_star(&map).unwrap();
+    let fair_path_cost = generate_fair_path_cost(&path);
+    let finished = explore_and_get_finished(&map, cost as usize - 100 + 1, &fair_path_cost);
     finished.to_string()
 }
-pub fn part2(input: &str) -> String {
-    todo!();
-}
+// pub fn part2(input: &str) -> String {
+//     let map = parse_input(input);
+//     let (path, cost) = a_star(&map).unwrap();
+//     let fair_path_cost = generate_fair_path_cost(&path);
+//     let finished = explore_and_get_finished(&map, cost as usize - 50 + 1, &fair_path_cost, 20);
+//     finished.to_string()
+// }
 
 type Coord = (isize, isize);
 struct Map {
@@ -28,20 +31,21 @@ struct Explorer {
     pos: Coord,
     prev_pos: Option<Coord>,
 }
-fn explore_and_get_finished(map: &Map, max_steps: usize) -> usize {
+fn explore_and_get_finished(map: &Map, max_steps: usize, fair_path_cost: &HashMap<Coord, usize>) -> usize {
     let mut finished = 0;
     let mut explorers: FrequencyMap<Explorer> = FrequencyMap::new();
     explorers.add(Explorer{ has_cheated: false, pos: map.start, prev_pos: None}, 1);
     for i in 0..max_steps {
-        let (new_explorers, new_finished) = step(map, &explorers, max_steps - i);
+        let (new_explorers, new_finished) = step(map, &explorers, max_steps - i, fair_path_cost);
         finished += new_finished;
         explorers = new_explorers;
-        println!("{}, {}, {}", max_steps - i, explorers.map.len(), new_finished);
+        // println!("{}, {}, {}", max_steps - i, explorers.map.len(), new_finished);
     }
     return finished;
 }
-
-fn step(map: &Map, explorers: &FrequencyMap<Explorer>, limit: usize) -> (FrequencyMap<Explorer>, usize) {
+fn step(map: &Map, explorers: &FrequencyMap<Explorer>, limit: usize, fair_path_cost: &HashMap<Coord, usize>) 
+    -> (FrequencyMap<Explorer>, usize) 
+{
     let mut new_explorers: FrequencyMap<Explorer> = FrequencyMap::new();
     let mut finished = 0;
     for (explorer, count) in explorers.map.iter() {
@@ -53,9 +57,15 @@ fn step(map: &Map, explorers: &FrequencyMap<Explorer>, limit: usize) -> (Frequen
             continue;
         }
         if explorer.has_cheated {
+            if let Some(cost) = fair_path_cost.get(&explorer.pos) {
+                if *cost <= limit {
+                    finished += count;
+                }
+                continue;
+            }
             for (neigh, _) in map.get_neighbors(&explorer.pos) {
-                if Some(*neigh) == explorer.prev_pos { continue; }
-                let new_exp = Explorer{ has_cheated: true, pos: *neigh, prev_pos: Some(explorer.pos)};
+                if Some(neigh) == explorer.prev_pos { continue; }
+                let new_exp = Explorer{ has_cheated: true, pos: neigh, prev_pos: Some(explorer.pos)};
                 new_explorers.add(new_exp, *count);
             }
         } else {
@@ -77,6 +87,15 @@ fn step(map: &Map, explorers: &FrequencyMap<Explorer>, limit: usize) -> (Frequen
     return (new_explorers, finished);
 }
 
+fn generate_fair_path_cost(vec: &[Coord]) -> HashMap<Coord, usize> {
+    let mut map: HashMap<Coord, usize> = HashMap::new();
+    let n = vec.len();
+    for (i, pos) in vec.iter().enumerate() {
+        map.insert(*pos, n-i-1);
+    }
+    return map;
+}
+
 struct FrequencyMap<T> {
     pub map: HashMap<T, usize>,
 }
@@ -92,11 +111,9 @@ where
     }
 }
 
-
-
-impl AStarGraph2<Coord> for Map {
-    fn get_neighbors(&self, node: &Coord) -> &Vec<(Coord, isize)> {
-        self.connection_map.get(node).unwrap()
+impl AStarGraph<Coord> for Map {
+    fn get_neighbors(&self, node: &Coord) -> Vec<(Coord, isize)> {
+        self.connection_map.get(node).cloned().unwrap_or_default()
     }
 
     fn get_heutistic(&self, node: &Coord) -> isize {
