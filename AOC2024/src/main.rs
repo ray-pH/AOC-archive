@@ -14,7 +14,7 @@ fn main() {
     print_header();
     let mut p = Printer::new(40);
     
-    if false {
+    if true {
         p.print_day(1);
         p.run(&d01::part1, "Part 1", "01.txt");
         p.run(&d01::part2, "Part 2", "01.txt");
@@ -96,12 +96,12 @@ fn main() {
         p.run(&d19::part1, "Part 1", "19.txt");
         p.run(&d19::part2, "Part 2", "19.txt");
         
+        p.print_day(20);
+        p.run(&d20::part1, "Part 1", "20.txt");
+        p.run(&d20::part2, "Part 2", "20.txt");
+        
         p.done();
     }
-    
-    p.print_day(20);
-    p.run(&d20::part1, "Part 1", "20.txt");
-    // p.run(&d20::part2, "Part 2", "20.txt");
     
 }
 

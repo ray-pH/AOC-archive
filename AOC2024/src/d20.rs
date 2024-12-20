@@ -8,13 +8,12 @@ pub fn part1(input: &str) -> String {
     let finished = explore_and_get_finished(&map, cost as usize - 100 + 1, &fair_path_cost);
     finished.to_string()
 }
-// pub fn part2(input: &str) -> String {
-//     let map = parse_input(input);
-//     let (path, cost) = a_star(&map).unwrap();
-//     let fair_path_cost = generate_fair_path_cost(&path);
-//     let finished = explore_and_get_finished(&map, cost as usize - 50 + 1, &fair_path_cost, 20);
-//     finished.to_string()
-// }
+pub fn part2(input: &str) -> String {
+    let map = parse_input(input);
+    let (path, _) = a_star(&map).unwrap();
+    let fair_path_cost = generate_fair_path_cost_vec(&path);
+    count_cheats(&fair_path_cost, 20, 100).to_string()
+}
 
 type Coord = (isize, isize);
 struct Map {
@@ -22,6 +21,24 @@ struct Map {
     pub walls: HashSet<Coord>,
     pub start: Coord,
     pub goal: (isize, isize),
+}
+
+fn manhattan(a: &Coord, b: &Coord) -> usize {
+    ((a.0 - b.0).abs() + (a.1 - b.1).abs()) as usize
+}
+fn count_cheats(fair_path_cost: &[(Coord, usize)], cheat_length: usize, min_saving: usize) -> usize {
+    let mut count = 0;
+    for i in 0..fair_path_cost.len() {
+        for j in i+1..fair_path_cost.len() {
+            let (a, a_cost) = fair_path_cost[i];
+            let (b, b_cost) = fair_path_cost[j];
+            let dist = manhattan(&a, &b);
+            if dist <= cheat_length && (a_cost - b_cost) - dist >= min_saving {
+                count += 1;
+            }
+        }
+    }
+    return count;
 }
 
 
@@ -92,6 +109,15 @@ fn generate_fair_path_cost(vec: &[Coord]) -> HashMap<Coord, usize> {
     let n = vec.len();
     for (i, pos) in vec.iter().enumerate() {
         map.insert(*pos, n-i-1);
+    }
+    return map;
+}
+
+fn generate_fair_path_cost_vec(vec: &[Coord]) -> Vec<(Coord, usize)> {
+    let mut map: Vec<(Coord, usize)> = Vec::new();
+    let n = vec.len();
+    for (i, pos) in vec.iter().enumerate() {
+        map.push((*pos, n-i-1));
     }
     return map;
 }
