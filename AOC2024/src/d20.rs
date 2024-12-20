@@ -1,38 +1,29 @@
 use std::collections::{HashMap, HashSet};
-use crate::utils::{a_star, AStarGraph};
 
 pub fn part1(input: &str) -> String {
-    let map = parse_input(input);
-    let (path, cost) = a_star(&map).unwrap();
-    let fair_path_cost = generate_fair_path_cost(&path);
-    let finished = explore_and_get_finished(&map, cost as usize - 100 + 1, &fair_path_cost);
-    finished.to_string()
+    let (path_set, start, end) = parse_input(input);
+    let path_vec = gen_path(&path_set, start, end);
+    let cost_map = gen_cost_map(&path_vec);
+    count_cheats1(&path_vec, cost_map, 100).to_string()
 }
 pub fn part2(input: &str) -> String {
-    let map = parse_input(input);
-    let (path, _) = a_star(&map).unwrap();
-    let fair_path_cost = generate_fair_path_cost_vec(&path);
-    count_cheats(&fair_path_cost, 20, 100).to_string()
+    let (path_set, start, end) = parse_input(input);
+    let path_vec = gen_path(&path_set, start, end);
+    let cost_vec = gen_cost_vec(&path_vec);
+    count_cheats2(&cost_vec, 20, 100).to_string()
 }
 
 type Coord = (isize, isize);
-struct Map {
-    pub connection_map: HashMap<Coord, Vec<(Coord, isize)>>,
-    pub walls: HashSet<Coord>,
-    pub start: Coord,
-    pub goal: (isize, isize),
-}
-
 fn manhattan(a: &Coord, b: &Coord) -> usize {
     ((a.0 - b.0).abs() + (a.1 - b.1).abs()) as usize
 }
-fn count_cheats(fair_path_cost: &[(Coord, usize)], cheat_length: usize, min_saving: usize) -> usize {
+fn count_cheats2(fair_path_cost: &[(Coord, isize)], cheat_length: isize, min_saving: isize) -> usize {
     let mut count = 0;
     for i in 0..fair_path_cost.len() {
-        for j in i+1..fair_path_cost.len() {
+        for j in i+min_saving as usize..fair_path_cost.len() {
             let (a, a_cost) = fair_path_cost[i];
             let (b, b_cost) = fair_path_cost[j];
-            let dist = manhattan(&a, &b);
+            let dist = manhattan(&a, &b) as isize;
             if dist <= cheat_length && (a_cost - b_cost) - dist >= min_saving {
                 count += 1;
             }
@@ -41,149 +32,80 @@ fn count_cheats(fair_path_cost: &[(Coord, usize)], cheat_length: usize, min_savi
     return count;
 }
 
+const KERNEL: [(isize, isize);4] = [(2,0),(0,2),(-2,0),(0,-2)];
+fn count_cheats1(path_vec: &[Coord], cost_map: HashMap<Coord, isize>, min_saving: isize) -> usize {
+    let mut count = 0;
+    for pos in path_vec {
+        for dpos in KERNEL {
+            let cost = cost_map.get(&pos).unwrap();
+            let npos = (pos.0 + dpos.0, pos.1 + dpos.1);
+            if let Some(ncost) = cost_map.get(&npos) {
+                let saving = cost - ncost - 2;
+                if saving >= min_saving {
+                    count += 1;
+                }
+            }
+        }
+    }
+    return count;
+}
 
-#[derive(Hash, PartialEq, Eq)]
 struct Explorer {
-    has_cheated: bool,
     pos: Coord,
-    prev_pos: Option<Coord>,
+    prev: Option<Coord>,
 }
-fn explore_and_get_finished(map: &Map, max_steps: usize, fair_path_cost: &HashMap<Coord, usize>) -> usize {
-    let mut finished = 0;
-    let mut explorers: FrequencyMap<Explorer> = FrequencyMap::new();
-    explorers.add(Explorer{ has_cheated: false, pos: map.start, prev_pos: None}, 1);
-    for i in 0..max_steps {
-        let (new_explorers, new_finished) = step(map, &explorers, max_steps - i, fair_path_cost);
-        finished += new_finished;
-        explorers = new_explorers;
-        // println!("{}, {}, {}", max_steps - i, explorers.map.len(), new_finished);
-    }
-    return finished;
-}
-fn step(map: &Map, explorers: &FrequencyMap<Explorer>, limit: usize, fair_path_cost: &HashMap<Coord, usize>) 
-    -> (FrequencyMap<Explorer>, usize) 
-{
-    let mut new_explorers: FrequencyMap<Explorer> = FrequencyMap::new();
-    let mut finished = 0;
-    for (explorer, count) in explorers.map.iter() {
-        if map.is_goal(&explorer.pos) {
-            finished += count;
-            continue;
-        }
-        if map.get_heutistic(&explorer.pos) > limit as isize {
-            continue;
-        }
-        if explorer.has_cheated {
-            if let Some(cost) = fair_path_cost.get(&explorer.pos) {
-                if *cost <= limit {
-                    finished += count;
-                }
-                continue;
-            }
-            for (neigh, _) in map.get_neighbors(&explorer.pos) {
-                if Some(neigh) == explorer.prev_pos { continue; }
-                let new_exp = Explorer{ has_cheated: true, pos: neigh, prev_pos: Some(explorer.pos)};
-                new_explorers.add(new_exp, *count);
-            }
-        } else {
-            for (dr, dc) in DIR {
-                let nr = explorer.pos.0 + dr;
-                let nc = explorer.pos.1 + dc;
-                let npos = (nr, nc);
-                if Some(npos) == explorer.prev_pos { continue; }
-                let is_wall = map.walls.contains(&npos); 
-                if is_wall {
-                    let nnpos = (nr + dr, nc + dc);
-                    if map.walls.contains(&nnpos) { continue; }
-                }
-                let new_exp = Explorer{ has_cheated: is_wall, pos: npos, prev_pos: Some(explorer.pos)};
-                new_explorers.add(new_exp, *count);
+const DIR: [(isize, isize);4] = [(1,0),(0,1),(-1,0),(0,-1)];
+fn gen_path(map: &HashSet<Coord>, start: Coord, end: Coord) -> Vec<Coord> {
+    let mut path: Vec<Coord> = Vec::new();
+    let mut exp = Explorer { pos: start, prev: None };
+    while exp.pos != end {
+        path.push(exp.pos);
+        for dpos in DIR {
+            let npos = (exp.pos.0 + dpos.0, exp.pos.1 + dpos.1);
+            if map.contains(&npos) && Some(npos) != exp.prev {
+                exp.prev = Some(exp.pos);
+                exp.pos = npos;
+                break;
             }
         }
     }
-    return (new_explorers, finished);
+    path.push(end);
+    return path;
 }
 
-fn generate_fair_path_cost(vec: &[Coord]) -> HashMap<Coord, usize> {
-    let mut map: HashMap<Coord, usize> = HashMap::new();
-    let n = vec.len();
+fn gen_cost_map(vec: &[Coord]) -> HashMap<Coord, isize> {
+    let mut map: HashMap<Coord, isize> = HashMap::new();
     for (i, pos) in vec.iter().enumerate() {
-        map.insert(*pos, n-i-1);
+        let cost = vec.len() - i - 1;
+        map.insert(*pos, cost as isize);
     }
     return map;
 }
-
-fn generate_fair_path_cost_vec(vec: &[Coord]) -> Vec<(Coord, usize)> {
-    let mut map: Vec<(Coord, usize)> = Vec::new();
-    let n = vec.len();
+fn gen_cost_vec(vec: &[Coord]) -> Vec<(Coord, isize)> {
+    let mut v: Vec<(Coord, isize)> = Vec::new();
     for (i, pos) in vec.iter().enumerate() {
-        map.push((*pos, n-i-1));
+        let cost = vec.len() - i - 1;
+        v.push((*pos, cost as isize));
     }
-    return map;
-}
-
-struct FrequencyMap<T> {
-    pub map: HashMap<T, usize>,
-}
-impl<T> FrequencyMap<T>
-where
-    T: std::hash::Hash + Eq, // HashMap requires these traits for keys
-{
-    fn new() -> Self {
-        Self { map: HashMap::new() }
-    }
-    fn add(&mut self, element: T, value: usize) {
-        *self.map.entry(element).or_default() += value
-    }
-}
-
-impl AStarGraph<Coord> for Map {
-    fn get_neighbors(&self, node: &Coord) -> Vec<(Coord, isize)> {
-        self.connection_map.get(node).cloned().unwrap_or_default()
-    }
-
-    fn get_heutistic(&self, node: &Coord) -> isize {
-        let (row, col) = node;
-        (row - self.goal.0).abs() + (col - self.goal.1).abs()
-    }
-
-    fn get_start(&self) -> Coord {
-        self.start
-    }
-
-    fn is_goal(&self, node: &Coord) -> bool {
-        node.0 == self.goal.0 && node.1 == self.goal.1
-    }
+    return v;
 }
 
 fn is_empty_char(c: char) -> bool {
     c == '.' || c == 'S' || c == 'E'
 }
-const DIR: [(isize, isize);4] = [(1,0),(0,1),(-1,0),(0,-1)];
-fn parse_input(input: &str) -> Map {
+fn parse_input(input: &str) -> (HashSet<Coord>, Coord, Coord) {
     let mut start = (0,0);
     let mut goal = (0,0);
-    let mut connection_map: HashMap<Coord, Vec<(Coord, isize)>> = HashMap::new();
-    let mut walls: HashSet<Coord> = HashSet::new();
-    let board = input.lines().map(|l| l.chars().collect()).collect::<Vec<Vec<char>>>();
+    let mut path: HashSet<Coord> = HashSet::new();
     for (row, line) in input.lines().enumerate() {
         for (col, s) in line.chars().enumerate() {
-            let r = row as isize;
-            let c = col as isize;
-            // if is_empty_char(s) {
-            for (dr, dc) in DIR {
-                let nr = r + dr;
-                let nc = c + dc;
-                let is_inside = nr >= 0 && nr < board.len() as isize && nc >= 0 && nc < board[0].len() as isize;
-                if is_inside && is_empty_char(board[nr as usize][nc as usize]) {
-                    connection_map.entry((r, c)).or_default().push(((nr, nc), 1));
-                }
+            let pos = (row as isize, col as isize);
+            if is_empty_char(s) {
+                path.insert(pos);
             }
-            // }
-            if s == '#' { walls.insert((r, c)); }
-            if s == 'S' { start = (r, c) }
-            if s == 'E' { goal = (r, c); }
+            if s == 'S' { start = pos; }
+            if s == 'E' { goal = pos; }
         }
     }
-    return Map { connection_map, start, goal, walls };
+    return (path, start, goal);
 }
