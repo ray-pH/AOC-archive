@@ -2,7 +2,7 @@
 
 use std::fs; 
 use std::io::{stdout, Write};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use colored::*;
 mod utils;
 mod d01; mod d02; mod d03; mod d04; mod d05; mod d05b;
@@ -12,7 +12,7 @@ mod d16; mod d17; mod d18; mod d19; mod d20;
 
 fn main() {
     print_header();
-    let mut p = Printer::new(40);
+    let mut p = Printer::new(40, 15);
     
     if true {
         p.print_day(1);
@@ -101,6 +101,8 @@ fn main() {
         p.run(&d20::part2, "Part 2", "20.txt");
         
         p.done();
+        println!();
+        println!("{}: {}", "Total".bold(), formatted_duration(p.total_duration).yellow());
     }
     
 }
@@ -110,11 +112,13 @@ struct Printer {
     row: usize,
     col: usize,
     max_row: usize,
-    column_width: usize
+    column_width: usize,
+    run_count: usize,
+    total_duration: Duration
 }
 impl Printer {
-    fn new(column_width: usize) -> Self {
-        Self { col: 1, row: 1, max_row: 1, column_width }
+    fn new(column_width: usize, run_count: usize) -> Self {
+        Self { col: 1, row: 1, max_row: 1, column_width, run_count, total_duration: Duration::new(0, 0) }
     }
     // fn println(&mut self, s: String) {
     //     println!("{}", s);
@@ -152,7 +156,11 @@ impl Printer {
         let input_str = read_input(input_filename);
         let start = Instant::now();
         let result = solver(&input_str);
-        let duration = start.elapsed();
+        for _ in 0..self.run_count-1 {
+            solver(&input_str);
+        }
+        let duration = start.elapsed()/self.run_count as u32;
+        self.total_duration += duration;
         let s = format!("  {}: {} {}", name.bold().dimmed(), result, formatted_duration(duration).yellow());
         self.println(s);
     }
@@ -168,11 +176,13 @@ fn read_input(filename: &str) -> String {
 }
 fn formatted_duration(duration: std::time::Duration) -> String {
     if duration.as_secs() > 0 {
-        format!("({} s)", duration.as_secs())
+        format!("({:.2} s)", duration.as_secs_f64())
     } else if duration.as_millis() > 0 {
-        format!("({} ms)", duration.as_millis())
+        let millis = duration.as_secs_f64() * 1000.0;
+        format!("({:.2} ms)", millis)
     } else if duration.as_micros() > 0 {
-        format!("({} us)", duration.as_micros())
+        let micros = duration.as_micros();
+        format!("({:.2} us)", micros)
     } else {
         format!("({} ns)", duration.as_nanos())
     }
