@@ -37,7 +37,7 @@ fn count_cheats1(path_vec: &[Coord], cost_map: HashMap<Coord, isize>, min_saving
     let mut count = 0;
     for pos in path_vec {
         for dpos in KERNEL {
-            let cost = cost_map.get(&pos).unwrap();
+            let cost = cost_map.get(pos).unwrap();
             let npos = (pos.0 + dpos.0, pos.1 + dpos.1);
             if let Some(ncost) = cost_map.get(&npos) {
                 let saving = cost - ncost - 2;
