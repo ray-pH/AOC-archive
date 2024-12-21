@@ -1,6 +1,6 @@
 #![allow(clippy::needless_return)]
 
-use std::fs; 
+use std::{env, fs}; 
 use std::io::{stdout, Write};
 use std::time::{Duration, Instant};
 use colored::*;
@@ -12,8 +12,14 @@ mod d16; mod d17; mod d18; mod d19; mod d20;
 mod d21;
 
 fn main() {
+    let arg = env::args().nth(1);
+    
+    let n: usize = arg.as_deref()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(1);
+    
     print_header();
-    let mut p = Printer::new(40, 15);
+    let mut p = Printer::new(40, n);
     
     if true {
         p.print_day(1);
