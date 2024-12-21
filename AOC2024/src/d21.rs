@@ -1,43 +1,73 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 pub fn part1(input: &str) -> String {
     let vec = parse_input(input);
-    vec.iter().map(|(vec, val)| val * get_minlen(vec)).sum::<usize>().to_string()
+        vec.iter().map(|(vec, val)| val * get_minlen(vec, 2)).sum::<usize>().to_string()
 }
 pub fn part2(input: &str) -> String {
-    todo!();
+    let vec = parse_input(input);
+    vec.iter().map(|(vec, val)| val * get_minlen(vec, 25)).sum::<usize>().to_string()
 }
 
-fn print_char_vec(v: &[char]) {
-    let s = v.iter().map(|c| *c).collect::<String>();
-    println!("{}", s);
-}
+// fn print_char_vec(v: &[char]) {
+//     let s = v.iter().map(|c| *c).collect::<String>();
+//     println!("{}", s);
+// }
 
-fn get_minlen(key: &[char]) -> usize {
+fn get_minlen(key: &[char], depth: usize) -> usize {
     let r1s = get_numeric_movement(key);
     let r1minlen = r1s.iter().map(|r| r.len()).min().unwrap();
     let r1s = r1s.iter().filter(|r| r.len() == r1minlen).collect::<Vec<_>>();
-    let r2s = r1s.iter().flat_map(|r| get_directional_movement(r)).collect::<Vec<_>>();
-    let r2minlen = r2s.iter().map(|r| r.len()).min().unwrap();
-    let r2s = r2s.iter().filter(|r| r.len() == r2minlen).collect::<Vec<_>>();
-    let r3s = r2s.iter().flat_map(|r| get_directional_movement(r)).collect::<Vec<_>>();
-    let r3minlen = r3s.iter().map(|r| r.len()).min().unwrap();
-    r3minlen
+    let mut cache = HashMap::new();
+    r1s.iter().map(|r| get_directional_minlen(r, depth, &mut cache)).min().unwrap()
+}
+
+type State = (Vec<char>, usize);
+//             segment  depth
+fn get_directional_minlen(key: &[char], depth: usize, cache: &mut HashMap<State, usize>) -> usize {
+    let split: Vec<_> = key.split(|s| *s == 'A').map(|s| [s, &['A']].concat()).collect();
+    split.iter().take(split.len()-1).map(|s| get_directional_minlen_segment(s, depth, cache)).sum()
+}
+fn get_directional_minlen_segment(segment: &[char], depth: usize, cache: &mut HashMap<State, usize>) -> usize {
+    let state: State = (segment.to_vec(), depth);
+    if let Some(minlen) = cache.get(&state) {
+        return *minlen;
+    }
+    
+    if depth == 0 {
+        return segment.len();
+    }
+    
+    let mut result = HashSet::new();
+    result.insert(Vec::new());
+    let mut curr = 'A';
+    for c in segment {
+        let mut new_result = HashSet::new();
+        let diff = vec_diff(&directional_keypad_pos(*c).unwrap(), &directional_keypad_pos(curr).unwrap());
+        let pref_dir = directional_pref_dir(curr, *c);
+        let movements = get_movements(diff, pref_dir);
+        
+        for r in result {
+            for m in movements.iter() {
+                let mut new_v = r.clone();
+                new_v.extend(m);
+                new_v.push('A');
+                new_result.insert(new_v);
+            }
+        }
+        curr = *c;
+        result = new_result;
+    }
+    
+    let minlen = result.iter().map(|key| get_directional_minlen(key, depth-1, cache)).min().unwrap();
+    cache.insert(state, minlen);
+    return minlen;
 }
 
 type Pos = (i32, i32);
 
 const fn vec_diff(a: &Pos, b: &Pos) -> Pos {
     (a.0 - b.0, a.1 - b.1)
-}
-const fn dir_to_vec(dir: char) -> Option<Pos> {
-    match dir {
-        '^' => Some((0, 1)),
-        'v' => Some((0, -1)),
-        '<' => Some((-1, 0)),
-        '>' => Some((1, 0)),
-        _ => None
-    }
 }
 const fn vec_to_dir(vec: Pos) -> Option<char> {
     match vec {
@@ -57,30 +87,6 @@ fn get_numeric_movement(key: &[char]) -> HashSet<Vec<char>> {
         let mut new_result = HashSet::new();
         let diff = vec_diff(&numeric_keypad_pos(*c).unwrap(), &numeric_keypad_pos(curr).unwrap());
         let pref_dir = numeric_pref_dir(curr, *c);
-        let movements = get_movements(diff, pref_dir);
-        
-        for r in result {
-            for m in movements.iter() {
-                let mut new_v = r.clone();
-                new_v.extend(m);
-                new_v.push('A');
-                new_result.insert(new_v);
-            }
-        }
-        curr = *c;
-        result = new_result;
-    }
-    result
-}
-
-fn get_directional_movement(key: &[char]) -> HashSet<Vec<char>> {
-    let mut result = HashSet::new();
-    result.insert(Vec::new());
-    let mut curr = 'A';
-    for c in key {
-        let mut new_result = HashSet::new();
-        let diff = vec_diff(&directional_keypad_pos(*c).unwrap(), &directional_keypad_pos(curr).unwrap());
-        let pref_dir = directional_pref_dir(curr, *c);
         let movements = get_movements(diff, pref_dir);
         
         for r in result {
