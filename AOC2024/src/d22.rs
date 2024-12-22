@@ -1,28 +1,17 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, ops::AddAssign};
 
 pub fn part1(input: &str) -> String {
     let nums = parse_input(input);
-    nums.iter().map(|n| step_n(*n, 2000)).sum::<isize>().to_string()
+    nums.iter().map(|n| step_n(*n, 2000)).sum::<i32>().to_string()
 }
 pub fn part2(input: &str) -> String {
     let nums = parse_input(input);
-    let seq_maps = nums.iter().map(|n| get_seq_map(*n)).collect::<Vec<_>>();
-    let unique_keys: HashSet<ChangeTuple> = HashSet::from_iter(seq_maps.iter().flat_map(|m| m.keys().cloned()));
-    
-    // let mut best_seq = ChangeTuple::default();
-    let mut best_price = 0;
-    for key in unique_keys {
-        let price: usize = seq_maps.iter().map(|m| m.get(&key).unwrap_or(&0)).sum();
-        if price > best_price {
-            // best_seq = key;
-            best_price = price;
-        }
-    }
-    // println!("{},{},{},{}", best_seq.0, best_seq.1, best_seq.2, best_seq.3);
-    best_price.to_string()
+    let mut price_map: HashMap<ChangeTuple, u32> = HashMap::new();
+    nums.iter().for_each(|n| update_price_map(*n, &mut price_map));
+    price_map.values().max().unwrap().to_string()
 }
 
-fn step_n(sec: isize, n: usize) -> isize {
+fn step_n(sec: i32, n: usize) -> i32 {
     let mut sec = sec;
     for _ in 0..n {
         sec = step(sec);
@@ -31,7 +20,7 @@ fn step_n(sec: isize, n: usize) -> isize {
 }
 
 #[allow(clippy::let_and_return)]
-const fn step(sec: isize) -> isize {
+const fn step(sec: i32) -> i32 {
     let sec = ((sec << 6) ^ sec) & 0xffffff;
     let sec = ((sec >> 5) ^ sec) & 0xffffff;
     let sec = ((sec << 11) ^ sec) & 0xffffff;
@@ -39,8 +28,8 @@ const fn step(sec: isize) -> isize {
 }
 
 type ChangeTuple = (i8, i8, i8, i8);
-fn get_seq_map(init_sec: isize) -> HashMap<ChangeTuple, usize> {
-    let mut seq_map: HashMap<ChangeTuple, usize> = HashMap::new();
+fn update_price_map(init_sec: i32, price_map: &mut HashMap<ChangeTuple, u32>) {
+    let mut visited: HashSet<ChangeTuple> = HashSet::new();
     let mut s0 = init_sec;
     let mut s1 = step(s0);
     let mut s2 = step(s1);
@@ -53,12 +42,14 @@ fn get_seq_map(init_sec: isize) -> HashMap<ChangeTuple, usize> {
         let c3 = d3 - d2;
         let c4 = d4 - d3;
         let key = (c1 as i8, c2 as i8, c3 as i8, c4 as i8);
-        seq_map.entry(key).or_insert(d4 as usize);
+        if !visited.contains(&key) {
+            visited.insert(key);
+            price_map.entry(key).or_default().add_assign(d4 as u32);
+        }
         (s0, s1, s2, s3, s4) = (s1, s2, s3, s4, step(s4));
     }
-    seq_map
 }
 
-fn parse_input(input: &str) -> Vec<isize> {
+fn parse_input(input: &str) -> Vec<i32> {
     input.lines().map(|l| l.parse().unwrap()).collect()
 }
