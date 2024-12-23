@@ -15,7 +15,7 @@ pub fn part2(input: &str) -> String {
     format!("{},{}", result.0, result.1)
 }
 
-fn find_first_block(vec: Vec<Pos>, init: usize, target: isize) -> (isize, isize) {
+fn find_first_block(vec: Vec<Pos>, init: usize, target: i8) -> (i8, i8) {
     let mut latest_path_set: HashSet<Pos> = HashSet::new();
     for i in init..vec.len() {
         let latest_pos = vec[i-1];
@@ -30,10 +30,10 @@ fn find_first_block(vec: Vec<Pos>, init: usize, target: isize) -> (isize, isize)
     return (0,0);
 }
 
-type Pos = (isize, isize);
-const DIR: [(isize, isize);4] = [(1,0),(0,1),(-1,0),(0,-1)];
+type Pos = (i8, i8);
+const DIR: [(i8, i8);4] = [(1,0),(0,1),(-1,0),(0,-1)];
 struct Map {
-    pub target: isize,
+    pub target: i8,
     pub obstacles: HashSet<Pos>
 }
 impl AStarGraph<Pos> for Map {
@@ -51,7 +51,7 @@ impl AStarGraph<Pos> for Map {
 
     fn get_heutistic(&self, node: &Pos) -> isize {
         let (row, col) = node;
-        (row - self.target).abs() + (col - self.target).abs()
+        (row - self.target).abs() as isize + (col - self.target).abs() as isize
     }
 
     fn get_start(&self) -> Pos {
@@ -63,7 +63,7 @@ impl AStarGraph<Pos> for Map {
     }
 }
 
-fn generate_map(vec: &[Pos], take: usize, target: isize) -> Map {
+fn generate_map(vec: &[Pos], take: usize, target: i8) -> Map {
     let obstacles: HashSet<Pos> = vec.iter().take(take).cloned().collect();
     Map { target, obstacles }
 }
