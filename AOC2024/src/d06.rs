@@ -29,18 +29,18 @@ fn insert_sorted<T: Ord>(vec: &mut Vec<T>, element: T) {
     }
 }
 
-type Pos = (usize, usize);
+type Pos = (u8, u8);
 #[derive(Clone)]
 struct LineMap {
-    column: HashMap<usize, Vec<usize>>,
-    row: HashMap<usize, Vec<usize>>,
-    col_size: usize,
-    row_size: usize,
+    column: HashMap<u8, Vec<u8>>,
+    row: HashMap<u8, Vec<u8>>,
+    col_size: u8,
+    row_size: u8,
 }
 
 #[derive(Hash, PartialEq, Eq, Clone)]
 enum DirType { X, Y }
-type Dir = (DirType, i32);
+type Dir = (DirType, i8);
 fn rotate_dir(dir: Dir) -> Dir {
     match dir {
         (DirType::X, 1) => (DirType::Y, 1),
@@ -148,19 +148,19 @@ fn parse_input(input: &str) -> (LineMap, Pos) {
     let mut map = LineMap {
         column: HashMap::new(),
         row: HashMap::new(),
-        col_size: input.lines().next().unwrap().len(),
-        row_size: input.lines().count(),
+        col_size: input.lines().next().unwrap().len() as u8,
+        row_size: input.lines().count() as u8,
     };
     let mut guard_pos = (0,0);
     for (row, line) in input.lines().enumerate() {
         for (col, char) in line.chars().enumerate() {
             if char == '^' {
-                guard_pos = (row, col);
+                guard_pos = (row as u8, col as u8);
             } else if char == '#' {
-                map.column.entry(col).or_default();
-                map.row.entry(row).or_default();
-                map.column.get_mut(&col).unwrap().push(row);
-                map.row.get_mut(&row).unwrap().push(col);
+                map.column.entry(col as u8).or_default();
+                map.row.entry(row as u8).or_default();
+                map.column.get_mut(&(col as u8)).unwrap().push(row as u8);
+                map.row.get_mut(&(row as u8)).unwrap().push(col as u8);
             }
         }
     }
