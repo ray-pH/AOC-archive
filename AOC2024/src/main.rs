@@ -81,7 +81,7 @@ fn main() {
         
         p.print_day(14);
         p.run(&d14::part1, "Part 1", "14.txt");
-        p.run(&d14::part2, "Part 2", "14.txt");
+        p.run(&d14::part2, "Part 2*", "14.txt");
         
         p.print_day(15);
         p.run(&d15::part1, "Part 1", "15.txt");
