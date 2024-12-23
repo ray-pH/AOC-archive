@@ -7,8 +7,8 @@ pub fn part1(input: &str) -> String {
 }
 pub fn part2(input: &str) -> String {
     let map = parse_input(input);
-    let all_nodes: HashSet<Computer> = map.keys().cloned().collect();
-    let max_clique = bron_kerbosch(&map, HashSet::new(), all_nodes, HashSet::new());
+    let all_nodes: Vec<Computer> = map.keys().cloned().collect();
+    let max_clique = bron_kerbosch(&map, Vec::new(), all_nodes, Vec::new());
     let mut max_clique_vec: Vec<String> = max_clique.iter().map(computer_to_string).collect();
     max_clique_vec.sort();
     max_clique_vec.join(",")
@@ -32,28 +32,26 @@ fn generate_t_three_pairs(map: &ComputerMap) -> HashSet<(&Computer, &Computer, &
     set
 }
 
-fn bron_kerbosch(graph: &ComputerMap, r: ComputerSet, p: ComputerSet, x: ComputerSet) -> ComputerSet {
+fn bron_kerbosch(graph: &ComputerMap, r: ComputerVec, p: ComputerVec, x: ComputerVec) -> ComputerVec {
     if p.is_empty() && x.is_empty() {
-        return r;
+        return r.to_vec();
     }
     let mut x = x.clone();
-    let mut mutp = p.clone();
-    let mut max_clique: ComputerSet = HashSet::new();
-    for v in p.iter() {
-        let mut new_r = r.clone();
-        new_r.insert(*v);
+    let mut mut_p = p.clone();
+    let mut max_clique: ComputerVec = Vec::new();
+    for v in p.iter().rev() {
+        let new_r: Vec<_> = r.iter().chain([v]).cloned().collect();
         
-        let empty_set = HashSet::new();
-        let neighbors = graph.get(v).unwrap_or(&empty_set);
-        let new_p = mutp.intersection(neighbors).cloned().collect();
-        let new_x = x.intersection(neighbors).cloned().collect();
-        
-        let clique = bron_kerbosch(graph, new_r, new_p, new_x);
-        if clique.len() > max_clique.len() {
-            max_clique = clique;
+        if let Some(neighbors) = graph.get(v) {
+            let new_p = mut_p.iter().filter(|n| neighbors.contains(n)).cloned().collect();
+            let new_x = x.iter().filter(|n| neighbors.contains(n)).cloned().collect();
+            let clique = bron_kerbosch(graph, new_r, new_p, new_x);
+            if clique.len() > max_clique.len() {
+                max_clique = clique;
+            }
         }
-        mutp.remove(v);
-        x.insert(*v);
+        mut_p.pop();
+        x.push(*v);
     }
     return max_clique;
 }
@@ -64,7 +62,7 @@ fn computer_to_string(computer: &Computer) -> String {
 
 type Computer = (char, char);
 type ComputerMap = HashMap<Computer, HashSet<Computer>>;
-type ComputerSet = HashSet<Computer>;
+type ComputerVec = Vec<Computer>;
 fn parse_input(input: &str) -> ComputerMap {
     let mut computers: ComputerMap = HashMap::new();
     input.lines().for_each(|line| {
