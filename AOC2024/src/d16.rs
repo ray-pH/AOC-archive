@@ -8,7 +8,7 @@ pub fn part1(input: &str) -> String {
 pub fn part2(input: &str) -> String {
     let map = parse_input(input);
     let points = a_star_all_points(&map);
-    let points: HashSet<(isize, isize)> = HashSet::from_iter(points.iter().map(|c| (c.0, c.1)));
+    let points: HashSet<(i16, i16)> = HashSet::from_iter(points.iter().map(|c| (c.0, c.1)));
     return points.len().to_string();
 }
 
@@ -16,8 +16,8 @@ pub fn part2(input: &str) -> String {
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct Node<T> {
     pos: T,
-    cost: isize,
-    est_cost: isize,
+    cost: i32,
+    est_cost: i32,
 }
 impl<T: Eq> Ord for Node<T> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
@@ -32,19 +32,19 @@ impl<T: Eq> PartialOrd for Node<T> {
 }
 
 trait AStarGraph<T> {
-    fn get_neighbors(&self, node: &T) -> &Vec<(T, isize)>;
-    fn get_heutistic(&self, node: &T) -> isize;
+    fn get_neighbors(&self, node: &T) -> &Vec<(T, i32)>;
+    fn get_heutistic(&self, node: &T) -> i32;
     fn get_start(&self) -> T;
     fn is_goal(&self, node: &T) -> bool;
 }
 
-fn a_star<T>(graph: &impl AStarGraph<T>) -> Option<(Vec<T>, isize)>
+fn a_star<T>(graph: &impl AStarGraph<T>) -> Option<(Vec<T>, i32)>
 where
     T: Eq + std::hash::Hash + Clone + std::fmt::Debug,
 {
     let mut open_set: BinaryHeap<Node<T>> = BinaryHeap::new();
     let mut came_from: HashMap<T, T> = HashMap::new();
-    let mut g_score: HashMap<T, isize> = HashMap::new();
+    let mut g_score: HashMap<T, i32> = HashMap::new();
     
     let start = graph.get_start();
     open_set.push(Node {
@@ -65,7 +65,7 @@ where
         }
         for (neigh, cost) in graph.get_neighbors(&current.pos) {
             let tentative_g_score = g_score[&current.pos] + cost;
-            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&isize::MAX) {
+            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&i32::MAX) {
                 came_from.insert(neigh.clone(), current.pos.clone());
                 g_score.insert(neigh.clone(), tentative_g_score);
                 open_set.push(Node {
@@ -84,8 +84,8 @@ where
     T: Eq + std::hash::Hash + Clone + std::fmt::Debug,
 {
     let mut open_set: BinaryHeap<Node<T>> = BinaryHeap::new();
-    let mut came_from: HashMap<T, (Vec<T>, isize)> = HashMap::new();
-    let mut g_score: HashMap<T, isize> = HashMap::new();
+    let mut came_from: HashMap<T, (Vec<T>, i32)> = HashMap::new();
+    let mut g_score: HashMap<T, i32> = HashMap::new();
     let mut goals: HashSet<T> = HashSet::new();
     let mut points: HashSet<T> = HashSet::new();
     
@@ -103,7 +103,7 @@ where
         }
         for (neigh, cost) in graph.get_neighbors(&current.pos) {
             let tentative_g_score = g_score[&current.pos] + cost;
-            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&isize::MAX) {
+            if tentative_g_score <= *g_score.get(neigh).unwrap_or(&i32::MAX) {
                 g_score.insert(neigh.clone(), tentative_g_score);
                 open_set.push(Node {
                     pos: neigh.clone(),
@@ -145,20 +145,20 @@ where
 }
 
 
-type Coord = (isize, isize, isize);
+type Coord = (i16, i16, i16);
 struct Map {
-    pub connection_map: HashMap<Coord, Vec<(Coord, isize)>>,
+    pub connection_map: HashMap<Coord, Vec<(Coord, i32)>>,
     pub start: Coord,
-    pub goal: (isize, isize),
+    pub goal: (i16, i16),
 }
 impl AStarGraph<Coord> for Map {
-    fn get_neighbors(&self, node: &Coord) -> &Vec<(Coord, isize)> {
+    fn get_neighbors(&self, node: &Coord) -> &Vec<(Coord, i32)> {
         self.connection_map.get(node).unwrap()
     }
 
-    fn get_heutistic(&self, node: &Coord) -> isize {
+    fn get_heutistic(&self, node: &Coord) -> i32 {
         let (row, col, _) = node;
-        (row - self.goal.0).abs() + (col - self.goal.1).abs()
+        (row - self.goal.0).abs() as i32 + (col - self.goal.1).abs() as i32
     }
 
     fn get_start(&self) -> Coord {
@@ -176,12 +176,12 @@ fn is_empty_char(c: char) -> bool {
 fn parse_input(input: &str) -> Map {
     let mut start = (0,0,0);
     let mut goal = (0,0);
-    let mut connection_map: HashMap<Coord, Vec<(Coord, isize)>> = HashMap::new();
+    let mut connection_map: HashMap<Coord, Vec<(Coord, i32)>> = HashMap::new();
     let board = input.lines().map(|l| l.chars().collect()).collect::<Vec<Vec<char>>>();
     for (row, line) in input.lines().enumerate() {
         for (col, s) in line.chars().enumerate() {
-            let r = row as isize;
-            let c = col as isize;
+            let r = row as i16;
+            let c = col as i16;
             if is_empty_char(s) {
                 // horizontal (0)
                 if is_empty_char(board[row][col+1]){
@@ -208,8 +208,8 @@ fn parse_input(input: &str) -> Map {
     }
     for (row, line) in input.lines().enumerate() {
         for (col, s) in line.chars().enumerate() {
-            let r = row as isize;
-            let c = col as isize;
+            let r = row as i16;
+            let c = col as i16;
             if is_empty_char(s) {
                 let is_horizontal = connection_map.contains_key(&(r, c, 0));
                 let is_vertical = connection_map.contains_key(&(r, c, 1));
