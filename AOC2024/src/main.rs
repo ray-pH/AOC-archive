@@ -178,7 +178,7 @@ impl Printer {
         }
         let duration = start.elapsed()/self.run_count as u32;
         self.total_duration += duration;
-        let s = format!("  {}: {} {}", name.bold().dimmed(), result, formatted_duration(duration).yellow());
+        let s = format!("  {}: {} {}", name.bold().dimmed(), result, formatted_duration(duration));
         self.println(s);
     }
 }
@@ -191,16 +191,16 @@ fn read_input(filename: &str) -> String {
     let full_path = format!("inputs/{}", filename);
     fs::read_to_string(full_path).expect("Could not read file")
 }
-fn formatted_duration(duration: std::time::Duration) -> String {
+fn formatted_duration(duration: std::time::Duration) -> ColoredString {
     if duration.as_secs() > 0 {
-        format!("({:.2} s)", duration.as_secs_f64())
+        format!("({:.2} s)", duration.as_secs_f64()).into()
     } else if duration.as_millis() > 0 {
         let millis = duration.as_secs_f64() * 1000.0;
-        format!("({:.2} ms)", millis)
+        format!("({:.2} ms)", millis).yellow().bold()
     } else if duration.as_micros() > 0 {
         let micros = duration.as_micros();
-        format!("({:.2} us)", micros)
+        format!("({:.2} us)", micros).yellow()
     } else {
-        format!("({} ns)", duration.as_nanos())
+        format!("({} ns)", duration.as_nanos()).dimmed()
     }
 }
