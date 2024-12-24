@@ -9,7 +9,7 @@ mod d01; mod d02; mod d03; mod d04; mod d05; mod d05b;
 mod d06; mod d07; mod d08; mod d09; mod d10;
 mod d11; mod d11b; mod d12; mod d13; mod d14; mod d15;
 mod d16; mod d17; mod d18; mod d19; mod d20;
-mod d21; mod d22; mod d23;
+mod d21; mod d22; mod d23; mod d24;
 
 fn main() {
     let arg = env::args().nth(1);
@@ -120,6 +120,10 @@ fn main() {
         p.print_day(23);
         p.run(&d23::part1, "Part 1", "23.txt");
         p.run(&d23::part2, "Part 2", "23.txt");
+        
+        p.print_day(24);
+        p.run(&d24::part1, "Part 1", "24.txt");
+        p.run(&d24::part2, "Part 2", "24.txt");
         
         p.done();
         println!();
